@@ -1,0 +1,2 @@
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+export default function ContaPage() { return <main className="min-h-screen bg-[#F7F8FA] p-6 text-[#0F1B33] lg:p-12"><div className="mx-auto max-w-2xl"><a href="/" className="text-sm text-slate-500">← Visão geral</a><Card className="mt-6"><CardHeader><CardTitle>Minha conta</CardTitle></CardHeader><CardContent className="grid gap-4 text-sm"><p><b>Nome</b><br />Ana Martins</p><p><b>E-mail</b><br />ana@eventengine.com.br</p><p><b>Plano</b><br />Solo</p></CardContent></Card></div></main> }

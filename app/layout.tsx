@@ -2,11 +2,12 @@ import { Analytics } from '@vercel/analytics/next'
 import { Inter } from 'next/font/google'
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import { AppShell } from '@/components/app-shell'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
 export const metadata: Metadata = {
-  title: 'Event Engine — Design system',
+  title: 'Event Engine',
   description: 'Sistema de design da plataforma Event Engine para cálculos técnicos de eventos.',
   generator: 'v0.app',
   icons: {
@@ -44,7 +45,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`${inter.variable} antialiased`}>
-        {children}
+        <AppShell>{children}</AppShell>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
