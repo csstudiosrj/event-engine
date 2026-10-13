@@ -26,9 +26,11 @@ export async function GET(request: Request) {
 
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
+      // Sempre redireciona para o painel após confirmação
+      const redirectTo = next.startsWith('/') ? next : '/painel'
+      return NextResponse.redirect(`${origin}${redirectTo}`)
     }
   }
 
-  return NextResponse.redirect(`${origin}/auth/login?error=auth_callback_error`)
+  return NextResponse.redirect(`${origin}/auth/login?error=link_invalido`)
 }

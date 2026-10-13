@@ -1,52 +1,24 @@
-import { Analytics } from '@vercel/analytics/next'
+import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { AppShell } from '@/components/app-shell'
+import { ToastProvider } from '@/components/ui/toast'
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
+const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Event Engine',
-  description: 'Sistema de design da plataforma Event Engine para cálculos técnicos de eventos.',
-  generator: 'v0.app',
-  icons: {
-    icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
-    apple: '/apple-icon.png',
-  },
+  description: 'Calculadoras técnicas para eventos',
 }
 
-export const viewport: Viewport = {
-  colorScheme: 'light dark',
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: 'white' },
-    { media: '(prefers-color-scheme: dark)', color: 'black' },
-  ],
-}
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR">
-      <body className={`${inter.variable} antialiased`}>
-        <AppShell>{children}</AppShell>
-        {process.env.NODE_ENV === 'production' && <Analytics />}
+      <body className={inter.className}>
+        <AppShell>
+          {children}
+          <ToastProvider />
+        </AppShell>
       </body>
     </html>
   )
