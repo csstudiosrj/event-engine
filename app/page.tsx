@@ -1,50 +1,30 @@
 'use client'
 
-import { useMemo, useState } from 'react'
 import {
-  Accessibility,
-  Armchair,
-  BadgeDollarSign,
+  ArrowRight,
   Bath,
-  Beer,
-  Boxes,
-  Building2,
-  Calculator,
   CheckCircle2,
   ChevronRight,
-  CircleDollarSign,
-  ClipboardCheck,
-  Coffee,
-  Droplets,
-  FileText,
   Flame,
-  GlassWater,
-  Headphones,
   KeyRound,
   LockKeyhole,
-  Menu,
-  PackageOpen,
-  PiggyBank,
-  Recycle,
-  Search,
+  MessageSquare,
+  Shield,
   ShieldCheck,
   Sparkles,
-  Ticket,
-  UserRound,
+  Timer,
   Users,
-  Utensils,
-  WalletCards,
   Zap,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
-import { Button, buttonVariants } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
+import { Footer } from '@/components/footer'
 
 function Logo() {
   return (
-    <div className="flex items-center gap-2" aria-label="Event Engine">
-      <svg viewBox="0 0 200 200" className="size-9" role="img" aria-label="Logo Event Engine">
+    <a href="/" className="flex items-center gap-2" aria-label="Event Engine">
+      <svg viewBox="0 0 200 200" className="size-9" aria-hidden="true">
         <rect x="20" y="20" width="160" height="160" rx="38" fill="#0F1B33" />
         <rect x="55" y="52" width="22" height="96" rx="11" fill="#FFFFFF" />
         <rect x="55" y="52" width="92" height="22" rx="11" fill="#FFFFFF" />
@@ -52,68 +32,390 @@ function Logo() {
         <rect x="55" y="126" width="92" height="22" rx="11" fill="#FFFFFF" />
         <circle cx="140" cy="100" r="12" fill="#F59E0B" />
       </svg>
-      <span className="text-lg font-bold tracking-tight text-[#0F1B33]">event <span className="text-[#F59E0B]">engine</span></span>
-    </div>
+      <span className="text-lg font-bold tracking-tight text-[#0F1B33]">
+        event <span className="text-[#F59E0B]">engine</span>
+      </span>
+    </a>
   )
 }
 
-type CalculatorItem = { name: string; description: string; icon: typeof Users; kind: 'Essencial' | 'Estratégica'; locked?: boolean }
-const groups: { name: string; icon: typeof ShieldCheck; items: CalculatorItem[] }[] = [
-  { name: 'Segurança e conformidade', icon: ShieldCheck, items: [
-    { name: 'Lotação e capacidade', description: 'Defina o público máximo do seu evento.', icon: Users, kind: 'Essencial' },
-    { name: 'Saídas de emergência', description: 'Dimensione rotas e saídas com segurança.', icon: KeyRound, kind: 'Essencial' },
-    { name: 'Brigada de incêndio', description: 'Estime a equipe de brigadistas necessária.', icon: Flame, kind: 'Essencial' },
-    { name: 'Equipe médica', description: 'Planeje o suporte médico para o público.', icon: FirstAidIcon, kind: 'Estratégica', locked: true },
-    { name: 'Segurança patrimonial', description: 'Calcule a equipe de segurança do evento.', icon: LockKeyhole, kind: 'Estratégica', locked: true },
-    { name: 'Acessibilidade', description: 'Garanta recursos e atendimento acessíveis.', icon: Accessibility, kind: 'Essencial' },
-  ] },
-  { name: 'Infraestrutura', icon: Building2, items: [
-    { name: 'Sanitários', description: 'Planeje a quantidade ideal de sanitários.', icon: Bath, kind: 'Essencial' },
-    { name: 'Geradores e energia', description: 'Estime a demanda de energia do evento.', icon: Zap, kind: 'Estratégica', locked: true },
-    { name: 'Sonorização', description: 'Dimensione a estrutura de áudio necessária.', icon: Headphones, kind: 'Essencial' },
-    { name: 'Água', description: 'Calcule o consumo de água esperado.', icon: Droplets, kind: 'Essencial' },
-    { name: 'Resíduos', description: 'Antecipe a geração e coleta de resíduos.', icon: Recycle, kind: 'Estratégica', locked: true },
-  ] },
-  { name: 'Operação e consumo', icon: ClipboardCheck, items: [
-    { name: 'Alimentação', description: 'Estime refeições e estrutura de alimentação.', icon: Utensils, kind: 'Essencial' },
-    { name: 'Bebidas', description: 'Calcule o volume de bebidas necessário.', icon: Beer, kind: 'Essencial' },
-    { name: 'Gelo', description: 'Planeje a quantidade de gelo para o evento.', icon: GlassWater, kind: 'Essencial' },
-    { name: 'Insumos', description: 'Organize os materiais de operação.', icon: PackageOpen, kind: 'Estratégica', locked: true },
-    { name: 'Recepção e credenciamento', description: 'Dimensione os postos de atendimento.', icon: UserRound, kind: 'Essencial' },
-  ] },
-  { name: 'Financeiro', icon: CircleDollarSign, items: [
-    { name: 'Ingressos e lotes', description: 'Modele sua estratégia de venda de ingressos.', icon: Ticket, kind: 'Essencial' },
-    { name: 'Ponto de equilíbrio', description: 'Descubra quando seu evento se paga.', icon: PiggyBank, kind: 'Estratégica', locked: true },
-    { name: 'Orçamento consolidado', description: 'Tenha uma visão completa dos custos.', icon: WalletCards, kind: 'Estratégica', locked: true },
-  ] },
+const calculadoras = [
+  { icon: Users,      name: 'Lotação e capacidade',   desc: 'Público máximo por m² conforme o estado' },
+  { icon: Bath,       name: 'Sanitários',              desc: 'Cabines por público, gênero e duração' },
+  { icon: Flame,      name: 'Brigada de incêndio',     desc: 'Brigadistas por área conforme NT/CBM' },
+  { icon: KeyRound,   name: 'Saídas de emergência',    desc: 'Largura e tempo de escoamento' },
+  { icon: Shield,     name: 'Equipe médica',           desc: 'Ambulâncias e postos por faixa de risco' },
+  { icon: LockKeyhole,name: 'Segurança patrimonial',   desc: 'Vigilantes conforme Port. DPF 18045/23' },
 ]
 
-function FirstAidIcon(props: React.ComponentProps<typeof ShieldCheck>) { return <HeartPulse {...props} /> }
-function HeartPulse(props: React.ComponentProps<typeof ShieldCheck>) { return <Sparkles {...props} /> }
+const dores = [
+  {
+    icon: Timer,
+    titulo: 'Horas de pesquisa para cada evento',
+    texto: 'Produtores gastam em média 4 horas pesquisando normas do Corpo de Bombeiros, Vigilância Sanitária e DPF — para cada evento. O Event Engine entrega isso em minutos.',
+  },
+  {
+    icon: MessageSquare,
+    titulo: 'Insegurança na hora do alvará',
+    texto: 'Sem saber se o dimensionamento está correto, o produtor fica refém do órgão. Com o Event Engine, você chega na vistoria com o memorial descritivo já fundamentado na norma certa.',
+  },
+  {
+    icon: Zap,
+    titulo: 'Consultoria cara para cada evento',
+    texto: 'Contratar um engenheiro de segurança para dimensionar um evento de 500 pessoas custa de R$ 800 a R$ 3.000. O Event Engine faz isso por R$ 4,90.',
+  },
+]
 
-const categories = ['Todos', ...groups.map((group) => group.name)]
+const planos = [
+  {
+    nome: 'Créditos',
+    preco: 'R$ 4,90',
+    periodo: '5 créditos',
+    descricao: 'Para quem organiza eventos esporadicamente e não quer assinatura.',
+    items: ['Qualquer calculadora essencial', 'Resultado com fundamentação legal', 'Sem mensalidade'],
+    cta: 'Comprar créditos',
+    href: '/auth/cadastro',
+    destaque: false,
+  },
+  {
+    nome: 'Solo',
+    preco: 'R$ 29,90',
+    periodo: 'por mês',
+    descricao: 'Para o produtor que tem pelo menos um evento ativo por vez.',
+    items: ['1 evento ativo', 'Todas as calculadoras', 'Memorial descritivo em PDF', 'Fundamentação legal completa'],
+    cta: 'Começar grátis',
+    href: '/auth/cadastro',
+    destaque: true,
+  },
+  {
+    nome: 'Pro',
+    preco: 'R$ 49,90',
+    periodo: 'por mês',
+    descricao: 'Para produtoras com múltiplos eventos simultâneos.',
+    items: ['Eventos ilimitados', 'Comparação de cenários', 'Histórico completo', 'Exportar dossiê PDF'],
+    cta: 'Assinar Pro',
+    href: '/auth/cadastro',
+    destaque: false,
+  },
+]
 
-export default function Page() {
-  const [query, setQuery] = useState('')
-  const [category, setCategory] = useState('Todos')
-  const filteredGroups = useMemo(() => groups.filter((group) => category === 'Todos' || group.name === category).map((group) => ({ ...group, items: group.items.filter((item) => `${item.name} ${item.description}`.toLowerCase().includes(query.toLowerCase())) })).filter((group) => group.items.length), [category, query])
+const faq = [
+  {
+    q: 'O resultado do Event Engine substitui um engenheiro ou consultor?',
+    a: 'Não — e somos transparentes sobre isso. O Event Engine é uma ferramenta de planejamento que aplica as normas técnicas vigentes para gerar estimativas confiáveis. Para eventos que exigem ART ou projeto aprovado, um profissional habilitado continua sendo necessário. O que muda é que você chega a ele (e ao órgão) com o trabalho inicial já feito.',
+  },
+  {
+    q: 'As normas variam por estado. Como o sistema lida com isso?',
+    a: 'O Event Engine é jurisdição-aware: você informa o estado e o sistema aplica a norma correta (CBMERJ para RJ, CBPMESP para SP, etc.). Quando não há norma estadual mapeada, usa a NBR Federal como fallback — e exibe um selo de alerta para que você confirme com o órgão local.',
+  },
+  {
+    q: 'O que é o Memorial Descritivo e por que preciso dele?',
+    a: 'É o documento técnico com todos os dimensionamentos do evento, fundamentado nas normas legais. Muitos municípios e o próprio Corpo de Bombeiros exigem esse documento para emitir o alvará. O Event Engine gera automaticamente nos planos Solo e Pro.',
+  },
+  {
+    q: 'Posso usar sem assinar?',
+    a: 'Sim. Seu primeiro cálculo é gratuito. Depois disso, você pode comprar pacotes de 5 créditos por R$ 4,90 sem precisar de assinatura.',
+  },
+]
 
+export default function HomePage() {
   return (
-    <div className="min-h-screen bg-[#F7F8FA] text-[#0F1B33]">
-      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur-sm">
+    <div className="min-h-screen bg-white text-[#0F1B33]">
+
+      {/* ── NAV ─────────────────────────────────────────── */}
+      <nav className="sticky top-0 z-20 border-b border-slate-100 bg-white/95 backdrop-blur-sm">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 lg:px-8">
-          <div className="flex items-center gap-3"><Button variant="ghost" size="icon" className="lg:hidden" aria-label="Abrir menu"><Menu /></Button><Logo /></div>
-          <div className="flex items-center gap-3"><Badge className="gap-1.5 bg-amber-100 text-amber-800 hover:bg-amber-100"><Zap data-icon="inline-start" />3 créditos</Badge><div className="flex size-9 items-center justify-center rounded-full bg-[#0F1B33] text-sm font-bold text-white" aria-label="Perfil de Ana Martins">AM</div></div>
+          <Logo />
+          <div className="flex items-center gap-2">
+            <a href="/precos" className="hidden text-sm font-medium text-slate-600 hover:text-[#0F1B33] sm:block">
+              Preços
+            </a>
+            <a href="/auth/login">
+              <Button variant="ghost" size="sm">Entrar</Button>
+            </a>
+            <a href="/auth/cadastro">
+              <Button size="sm" className="bg-[#0F1B33] hover:bg-[#1b2b4c]">
+                Começar grátis <ArrowRight className="ml-1.5 size-3.5" />
+              </Button>
+            </a>
+          </div>
         </div>
-      </header>
-      <main className="mx-auto max-w-7xl px-4 pb-16 pt-8 lg:px-8 lg:pt-12">
-        <div className="mb-8 flex flex-col gap-2"><p className="text-sm font-medium text-amber-600">Event Engine / Calculadoras</p><h1 className="text-3xl font-bold tracking-tight lg:text-4xl">Catálogo de calculadoras</h1><p className="max-w-2xl text-slate-600">Escolha uma calculadora para planejar seu evento com mais clareza, segurança e confiança.</p></div>
-        <Card className="mb-8 overflow-hidden border-amber-200 bg-[#FFF8E7] shadow-sm"><CardContent className="flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6"><div className="flex items-start gap-4"><div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-amber-400 text-[#0F1B33]"><Sparkles /></div><div><p className="text-sm font-semibold text-amber-900">Comece pelo essencial</p><h2 className="mt-1 text-xl font-bold text-[#0F1B33]">Seu primeiro cálculo é grátis</h2><p className="mt-1 text-sm text-amber-900/70">Experimente qualquer calculadora essencial sem gastar créditos.</p></div></div><a href="/calculadoras/sanitarios" className={`${buttonVariants({ className: 'w-full shrink-0 bg-[#0F1B33] hover:bg-[#1b2b4c] sm:w-auto' })}`}>Explorar agora <ChevronRight data-icon="inline-end" /></a></CardContent></Card>
-        <div className="relative mb-5"><Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" /><Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar uma calculadora..." aria-label="Buscar uma calculadora" className="h-12 border-slate-200 bg-white pl-10 shadow-sm" /></div>
-        <div className="mb-9 flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Filtrar por categoria">{categories.map((item) => <button key={item} onClick={() => setCategory(item)} role="tab" aria-selected={category === item} className={`whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium transition-colors ${category === item ? 'border-[#0F1B33] bg-[#0F1B33] text-white' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'}`}>{item}</button>)}</div>
-        <div className="flex flex-col gap-10">{filteredGroups.map((group) => { const GroupIcon = group.icon; return <section key={group.name} aria-labelledby={group.name}><div className="mb-4 flex items-center gap-3"><div className="flex size-9 items-center justify-center rounded-lg bg-[#0F1B33] text-white"><GroupIcon /></div><div><h2 id={group.name} className="font-bold">{group.name}</h2><p className="text-xs text-slate-500">{group.items.length} {group.items.length === 1 ? 'calculadora disponível' : 'calculadoras disponíveis'}</p></div></div><div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">{group.items.map((item) => { const Icon = item.icon; return <Card key={item.name} className="group border-slate-200 bg-white transition-all hover:-translate-y-0.5 hover:border-amber-300 hover:shadow-md"><CardContent className="flex min-h-36 flex-col p-5"><div className="flex items-start justify-between gap-3"><div className="flex size-10 items-center justify-center rounded-xl bg-slate-100 text-[#0F1B33] group-hover:bg-amber-100 group-hover:text-amber-700"><Icon /></div><Badge variant="outline" className={item.kind === 'Essencial' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-500'}>{item.locked && <LockKeyhole data-icon="inline-start" />}{item.kind}</Badge></div><h3 className="mt-4 font-semibold">{item.name}</h3><p className="mt-1 flex-1 text-sm leading-5 text-slate-500">{item.description}</p><a href={item.locked ? '/precos' : `/calculadoras/${item.name.toLowerCase().replaceAll(' ', '-').replaceAll('ã', 'a').replaceAll('ç', 'c').replaceAll('õ', 'o').replaceAll('é', 'e')}`} className="mt-4 flex items-center gap-1 text-sm font-semibold text-[#0F1B33] hover:text-amber-700">{item.locked ? 'Conhecer plano' : 'Abrir calculadora'} <ChevronRight data-icon="inline-end" /></a></CardContent></Card> })}</div></section> })}</div>
-        {filteredGroups.length === 0 && <Card className="border-dashed"><CardContent className="flex flex-col items-center gap-2 py-16 text-center"><Calculator className="text-slate-400" /><h2 className="font-semibold">Nenhuma calculadora encontrada</h2><p className="text-sm text-slate-500">Tente buscar por outro termo ou selecione outra categoria.</p></CardContent></Card>}
-      </main>
+      </nav>
+
+      {/* ── HERO ────────────────────────────────────────── */}
+      <section className="relative overflow-hidden bg-[#0F1B33] px-4 py-20 text-white lg:py-28">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_#F59E0B22,_transparent_60%)]" />
+        <div className="relative mx-auto max-w-4xl text-center">
+          <Badge className="mb-6 gap-1.5 border-amber-400/30 bg-amber-400/10 text-amber-400 hover:bg-amber-400/10">
+            <Sparkles className="size-3" /> Primeiro cálculo grátis
+          </Badge>
+          <h1 className="text-4xl font-bold leading-tight tracking-tight lg:text-6xl">
+            Tudo que o Corpo de Bombeiros vai exigir do seu evento —{' '}
+            <span className="text-[#F59E0B]">em minutos</span>
+          </h1>
+          <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-300 lg:text-xl">
+            O Event Engine aplica as normas técnicas vigentes — por estado — e entrega o dimensionamento
+            correto de brigada, sanitários, equipe médica, saídas de emergência e mais 15 calculadoras.
+            Sem pesquisa. Sem dúvida. Sem susto na vistoria.
+          </p>
+          <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+            <a href="/auth/cadastro">
+              <Button size="lg" className="w-full bg-[#F59E0B] text-[#0F1B33] hover:bg-amber-400 sm:w-auto">
+                Calcular meu evento agora <ArrowRight className="ml-2 size-4" />
+              </Button>
+            </a>
+            <a href="/precos">
+              <Button size="lg" variant="ghost" className="w-full border border-white/20 text-white hover:bg-white/10 sm:w-auto">
+                Ver planos e preços
+              </Button>
+            </a>
+          </div>
+          <p className="mt-5 text-sm text-slate-400">
+            Sem cartão de crédito. Primeiro cálculo gratuito.
+          </p>
+        </div>
+      </section>
+
+      {/* ── DORES ───────────────────────────────────────── */}
+      <section className="bg-slate-50 px-4 py-16 lg:py-20">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-12 text-center">
+            <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-amber-600">O problema</p>
+            <h2 className="text-3xl font-bold tracking-tight lg:text-4xl">
+              Produzir eventos no Brasil é burocrático por natureza
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-slate-600">
+              Normas que mudam por estado, órgãos diferentes pedindo documentos diferentes, e nenhuma
+              ferramenta que centralize tudo isso. Até agora.
+            </p>
+          </div>
+          <div className="grid gap-6 lg:grid-cols-3">
+            {dores.map(({ icon: Icon, titulo, texto }) => (
+              <Card key={titulo} className="border-slate-200 bg-white">
+                <CardContent className="p-6">
+                  <div className="mb-4 flex size-11 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
+                    <Icon className="size-5" />
+                  </div>
+                  <h3 className="mb-2 font-bold">{titulo}</h3>
+                  <p className="text-sm leading-relaxed text-slate-600">{texto}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── COMO FUNCIONA ───────────────────────────────── */}
+      <section className="px-4 py-16 lg:py-20">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-12 text-center">
+            <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-amber-600">Como funciona</p>
+            <h2 className="text-3xl font-bold tracking-tight lg:text-4xl">Três passos. Um evento seguro.</h2>
+          </div>
+          <div className="grid gap-8 lg:grid-cols-3">
+            {[
+              { n: '01', titulo: 'Cadastre seu evento', texto: 'Informe nome, data, cidade, público esperado e características do espaço. Esses dados alimentam todas as calculadoras de uma vez.' },
+              { n: '02', titulo: 'Escolha a calculadora', texto: 'Selecione o que precisa dimensionar — brigada, sanitários, equipe médica, saídas, segurança. O sistema aplica a norma do seu estado automaticamente.' },
+              { n: '03', titulo: 'Use o resultado', texto: 'Receba o dimensionamento fundamentado na lei. Salve, compartilhe ou baixe o Memorial Descritivo em PDF para apresentar ao órgão.' },
+            ].map(({ n, titulo, texto }) => (
+              <div key={n} className="flex gap-5">
+                <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-[#0F1B33] text-lg font-bold text-[#F59E0B]">
+                  {n}
+                </div>
+                <div>
+                  <h3 className="mb-2 font-bold">{titulo}</h3>
+                  <p className="text-sm leading-relaxed text-slate-600">{texto}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CALCULADORAS ────────────────────────────────── */}
+      <section className="bg-slate-50 px-4 py-16 lg:py-20">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-12 text-center">
+            <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-amber-600">O que calculamos</p>
+            <h2 className="text-3xl font-bold tracking-tight lg:text-4xl">
+              20 calculadoras. Uma plataforma.
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-slate-600">
+              Cada calculadora aplica a norma correta para o seu estado — do CBMERJ ao CBPMESP,
+              da Portaria federal às regras municipais.
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {calculadoras.map(({ icon: Icon, name, desc }) => (
+              <div key={name} className="flex items-start gap-4 rounded-xl border border-slate-200 bg-white p-4">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#0F1B33] text-white">
+                  <Icon className="size-5" />
+                </div>
+                <div>
+                  <p className="font-semibold">{name}</p>
+                  <p className="mt-0.5 text-sm text-slate-500">{desc}</p>
+                </div>
+              </div>
+            ))}
+            <div className="flex items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white p-4">
+              <p className="text-sm font-medium text-slate-500">
+                + 14 calculadoras disponíveis
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── DIFERENCIAIS ────────────────────────────────── */}
+      <section className="px-4 py-16 lg:py-20">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+            <div>
+              <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-amber-600">Por que o Event Engine</p>
+              <h2 className="text-3xl font-bold tracking-tight lg:text-4xl">
+                Base legal auditada. Resultado que você pode apresentar.
+              </h2>
+              <p className="mt-4 text-slate-600">
+                Cada parâmetro de cálculo tem rastreabilidade até a fonte oficial —
+                número da norma, artigo, data de vigência. Você não recebe um número solto:
+                recebe o número e a lei que o sustenta.
+              </p>
+              <ul className="mt-8 flex flex-col gap-4">
+                {[
+                  'Normas por estado: RJ, SP, PE e fallback federal',
+                  'Memorial Descritivo gerado automaticamente',
+                  'Alertas de recálculo quando o público muda',
+                  'Checklist de licenciamento por etapa',
+                  'Resultado compartilhável via link ou PDF',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3">
+                    <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-emerald-600" />
+                    <span className="text-sm text-slate-700">{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <a href="/auth/cadastro" className="mt-8 inline-block">
+                <Button className="bg-[#0F1B33] hover:bg-[#1b2b4c]">
+                  Começar agora <ArrowRight className="ml-2 size-4" />
+                </Button>
+              </a>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {[
+                { icon: ShieldCheck, titulo: 'Base legal verificada', texto: 'Normas auditadas por IA especializada antes de entrar no sistema.' },
+                { icon: Timer,       titulo: 'Minutos, não horas',    texto: 'O que levava horas de pesquisa agora leva menos de 5 minutos.' },
+                { icon: Zap,         titulo: 'Sempre atualizado',     texto: 'Quando uma norma muda, o sistema atualiza — não a sua planilha.' },
+                { icon: Users,       titulo: 'Para todo produtor',    texto: 'Do evento de 200 pessoas ao festival de 50 mil. A mesma ferramenta.' },
+              ].map(({ icon: Icon, titulo, texto }) => (
+                <Card key={titulo} className="border-slate-200">
+                  <CardContent className="p-5">
+                    <div className="mb-3 flex size-10 items-center justify-center rounded-lg bg-amber-100 text-amber-700">
+                      <Icon className="size-5" />
+                    </div>
+                    <p className="font-semibold">{titulo}</p>
+                    <p className="mt-1 text-sm text-slate-500">{texto}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── PLANOS ──────────────────────────────────────── */}
+      <section id="precos" className="bg-slate-50 px-4 py-16 lg:py-20">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-12 text-center">
+            <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-amber-600">Planos</p>
+            <h2 className="text-3xl font-bold tracking-tight lg:text-4xl">
+              Comece grátis. Pague só quando precisar.
+            </h2>
+          </div>
+          <div className="grid gap-6 lg:grid-cols-3">
+            {planos.map((plano) => (
+              <Card
+                key={plano.nome}
+                className={`relative border-2 ${plano.destaque ? 'border-[#0F1B33] shadow-xl' : 'border-slate-200'}`}
+              >
+                {plano.destaque && (
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                    <Badge className="bg-amber-500 text-white hover:bg-amber-500">Mais escolhido</Badge>
+                  </div>
+                )}
+                <CardContent className="flex flex-col gap-6 p-6">
+                  <div>
+                    <p className="text-sm font-semibold text-slate-500">{plano.nome}</p>
+                    <div className="mt-2 flex items-end gap-1">
+                      <span className="text-4xl font-bold">{plano.preco}</span>
+                      <span className="mb-1 text-sm text-slate-500">/{plano.periodo}</span>
+                    </div>
+                    <p className="mt-2 text-sm text-slate-600">{plano.descricao}</p>
+                  </div>
+                  <ul className="flex flex-col gap-2.5">
+                    {plano.items.map((item) => (
+                      <li key={item} className="flex items-start gap-2.5 text-sm">
+                        <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-600" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                  <a href={plano.href}>
+                    <Button
+                      className={`w-full ${plano.destaque ? 'bg-[#0F1B33] hover:bg-[#1b2b4c]' : ''}`}
+                      variant={plano.destaque ? 'default' : 'outline'}
+                    >
+                      {plano.cta} <ChevronRight className="ml-1 size-4" />
+                    </Button>
+                  </a>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── FAQ ─────────────────────────────────────────── */}
+      <section className="px-4 py-16 lg:py-20">
+        <div className="mx-auto max-w-3xl">
+          <div className="mb-12 text-center">
+            <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-amber-600">Dúvidas frequentes</p>
+            <h2 className="text-3xl font-bold tracking-tight">Perguntas e respostas</h2>
+          </div>
+          <div className="flex flex-col gap-4">
+            {faq.map(({ q, a }) => (
+              <Card key={q} className="border-slate-200">
+                <CardContent className="p-6">
+                  <p className="font-semibold">{q}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-600">{a}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA FINAL ───────────────────────────────────── */}
+      <section className="bg-[#0F1B33] px-4 py-16 text-white lg:py-20">
+        <div className="mx-auto max-w-3xl text-center">
+          <h2 className="text-3xl font-bold tracking-tight lg:text-4xl">
+            Seu próximo evento começa com o dimensionamento certo
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-slate-300">
+            Cadastre-se gratuitamente e faça seu primeiro cálculo agora.
+            Sem cartão de crédito. Sem burocracia.
+          </p>
+          <a href="/auth/cadastro" className="mt-8 inline-block">
+            <Button size="lg" className="bg-[#F59E0B] text-[#0F1B33] hover:bg-amber-400">
+              Criar conta grátis <ArrowRight className="ml-2 size-4" />
+            </Button>
+          </a>
+          <p className="mt-4 text-sm text-slate-400">
+            Primeiro cálculo gratuito. Cancele quando quiser.
+          </p>
+        </div>
+      </section>
+
+      <Footer />
     </div>
   )
 }
