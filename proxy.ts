@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { publicUrl } from '@/lib/config'
 
 const PUBLIC_ROUTES = ['/', '/precos', '/termos', '/privacidade', '/auth/login', '/auth/cadastro', '/auth/callback', '/auth/recuperar', '/auth/signout']
 // Rotas que tratam autenticação por conta própria (ex.: webhook do Pagar.me)
@@ -29,21 +30,14 @@ export async function proxy(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const path = request.nextUrl.pathname
 
-  // nextUrl.clone() preserva o basePath (/normato); new URL(path, request.url) não.
+  // Redireciona sempre para o domínio público (ver publicUrl em lib/config.ts)
   if (user && AUTH_ROUTES.some((r) => path.startsWith(r))) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/painel'
-    url.search = ''
-    return NextResponse.redirect(url)
+    return NextResponse.redirect(publicUrl('/painel'))
   }
 
   const isPublic = PUBLIC_ROUTES.includes(path) || PUBLIC_PREFIXES.some((p) => path.startsWith(p))
   if (!user && !isPublic) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/auth/login'
-    url.search = ''
-    url.searchParams.set('redirectTo', path + request.nextUrl.search)
-    return NextResponse.redirect(url)
+    return NextResponse.redirect(publicUrl('/auth/login', new URLSearchParams({ redirectTo: path + request.nextUrl.search })))
   }
 
   return supabaseResponse
