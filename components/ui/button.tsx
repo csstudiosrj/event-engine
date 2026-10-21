@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { Button as ButtonPrimitive } from '@base-ui/react/button'
 import { cva, type VariantProps } from 'class-variance-authority'
 
@@ -55,4 +56,14 @@ function Button({
   )
 }
 
-export { Button, buttonVariants }
+// Link interno com aparência de botão (o Button não aceita asChild)
+function ButtonLink({
+  className,
+  variant = 'default',
+  size = 'default',
+  ...props
+}: React.ComponentProps<typeof Link> & VariantProps<typeof buttonVariants>) {
+  return <Link data-slot="button" className={cn(buttonVariants({ variant, size, className }))} {...props} />
+}
+
+export { Button, ButtonLink, buttonVariants }

@@ -3,6 +3,8 @@
 import Link from "next/link"
 import { useState } from "react"
 import { useApp } from "@/components/app-shell"
+import { withBase } from "@/lib/config"
+import { hasActivePlan, planLabel } from "@/lib/plans"
 
 function NormatoSymbol({ size = 32 }: { size?: number }) {
   return (
@@ -68,7 +70,7 @@ export function Header() {
                   <circle cx="6" cy="6" r="5" stroke="#E8A020" strokeWidth="1.5" />
                   <path d="M6 3v3l2 1" stroke="#E8A020" strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
-                {profile.credits ?? 0} créditos
+                {hasActivePlan(profile) ? `Plano ${planLabel(profile)}` : `${profile.credits ?? 0} créditos`}
               </span>
 
               {/* Avatar dropdown */}
@@ -78,21 +80,21 @@ export function Header() {
                   className="w-9 h-9 rounded-full bg-[#1a2f4a] flex items-center justify-center text-white text-sm font-semibold border border-[#2a4060] hover:border-[#E8A020] transition-colors"
                   aria-label="Menu do usuário"
                 >
-                  {profile.full_name?.[0]?.toUpperCase() ?? "U"}
+                  {profile.name?.[0]?.toUpperCase() || profile.email?.[0]?.toUpperCase() || "U"}
                 </button>
 
                 {menuOpen && (
                   <div className="absolute right-0 mt-2 w-52 bg-[#0d2440] border border-[#1a2f4a] rounded-xl shadow-xl overflow-hidden z-50">
                     <div className="px-4 py-3 border-b border-[#1a2f4a]">
                       <p className="text-white text-sm font-medium truncate">
-                        {profile.full_name ?? "Usuário"}
+                        {profile.name || "Usuário"}
                       </p>
                       <p className="text-[#8ba4bc] text-xs truncate mt-0.5">
                         {profile.email ?? ""}
                       </p>
                     </div>
                     <Link
-                      href="/conta"
+                      href="/painel"
                       onClick={() => setMenuOpen(false)}
                       className="flex items-center gap-3 px-4 py-3 text-sm text-[#8ba4bc] hover:text-white hover:bg-[#1a2f4a] transition-colors"
                     >
@@ -100,10 +102,10 @@ export function Header() {
                         <circle cx="8" cy="5" r="3" stroke="currentColor" strokeWidth="1.5" />
                         <path d="M2 14c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                       </svg>
-                      Meu perfil
+                      Painel
                     </Link>
                     <Link
-                      href="/conta/plano"
+                      href="/conta"
                       onClick={() => setMenuOpen(false)}
                       className="flex items-center gap-3 px-4 py-3 text-sm text-[#8ba4bc] hover:text-white hover:bg-[#1a2f4a] transition-colors"
                     >
@@ -114,7 +116,7 @@ export function Header() {
                       </svg>
                       Plano e faturamento
                     </Link>
-                    <form action="/auth/signout" method="post">
+                    <form action={withBase("/auth/signout")} method="post">
                       <button
                         type="submit"
                         onClick={() => setMenuOpen(false)}

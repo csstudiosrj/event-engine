@@ -14,7 +14,10 @@ function LoginForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const redirectTo = searchParams.get("redirectTo") ?? "/painel"
+  const requested = searchParams.get("redirectTo") ?? "/painel"
+  // Só aceita caminhos internos, para o link de login não virar redirecionamento externo
+  const redirectTo = requested.startsWith("/") && !requested.startsWith("//") ? requested : "/painel"
+  const linkInvalido = searchParams.get("error") === "link_invalido"
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -42,7 +45,7 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0B1F3A] flex items-center justify-center px-6">
+    <div className="min-h-screen bg-[#0B1F3A] text-white flex items-center justify-center px-6">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex items-center justify-center gap-3 mb-10">
@@ -60,10 +63,16 @@ function LoginForm() {
           <h1 className="text-xl font-semibold mb-1">Entrar na conta</h1>
           <p className="text-[#8ba4bc] text-sm mb-8">
             Ainda não tem conta?{" "}
-            <Link href="/auth/cadastro" className="text-[#E8A020] hover:underline">
+            <Link href={`/auth/cadastro?redirectTo=${encodeURIComponent(redirectTo)}`} className="text-[#E8A020] hover:underline">
               Criar gratuitamente
             </Link>
           </p>
+
+          {linkInvalido && (
+            <div className="mb-5 bg-amber-900/20 border border-amber-500/30 rounded-lg px-4 py-3 text-sm text-amber-300">
+              O link expirou ou já foi usado. Entre com sua senha ou peça um novo link.
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <div>

@@ -17,6 +17,10 @@ export type Database = {
           name: string | null
           plan: 'free' | 'credits' | 'solo' | 'pro'
           credits: number
+          plan_expires_at: string | null
+          pagarme_customer_id: string | null
+          pagarme_subscription_id: string | null
+          accepted_terms_at: string | null
           created_at: string
           updated_at: string
         }
@@ -33,6 +37,10 @@ export type Database = {
           name?: string | null
           plan?: 'free' | 'credits' | 'solo' | 'pro'
           credits?: number
+          plan_expires_at?: string | null
+          pagarme_customer_id?: string | null
+          pagarme_subscription_id?: string | null
+          accepted_terms_at?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -95,9 +103,10 @@ export type Database = {
       calc_results: {
         Row: {
           id: string
-          event_id: string
+          event_id: string | null
           user_id: string
           calc_name: string
+          inputs: Json | null
           result_json: Json
           memorial_data: string | null
           is_compliant: boolean | null
@@ -107,9 +116,10 @@ export type Database = {
         }
         Insert: {
           id?: string
-          event_id: string
+          event_id?: string | null
           user_id: string
           calc_name: string
+          inputs?: Json | null
           result_json: Json
           memorial_data?: string | null
           is_compliant?: boolean | null
@@ -142,12 +152,55 @@ export type Database = {
         Update: never
         Relationships: []
       }
+      payments: {
+        Row: {
+          id: string
+          user_id: string
+          product: string
+          amount_cents: number
+          status: 'pending' | 'paid' | 'canceled'
+          pagarme_link_id: string | null
+          pagarme_order_id: string | null
+          pagarme_subscription_id: string | null
+          created_at: string
+          paid_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          product: string
+          amount_cents: number
+          status?: 'pending' | 'paid' | 'canceled'
+          pagarme_link_id?: string | null
+          pagarme_order_id?: string | null
+          pagarme_subscription_id?: string | null
+          paid_at?: string | null
+        }
+        Update: {
+          status?: 'pending' | 'paid' | 'canceled'
+          pagarme_link_id?: string | null
+          pagarme_order_id?: string | null
+          pagarme_subscription_id?: string | null
+          paid_at?: string | null
+        }
+        Relationships: []
+      }
+      webhook_events: {
+        Row: { id: string; type: string; received_at: string }
+        Insert: { id: string; type: string }
+        Update: never
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: {
       spend_credit: {
         Args: { p_user_id: string; p_amount: number }
-        Returns: unknown
+        Returns: number
+      }
+      grant_credits: {
+        Args: { p_user_id: string; p_amount: number; p_type: string; p_description: string }
+        Returns: number
       }
     }
     Enums: Record<string, never>
@@ -159,4 +212,5 @@ export type Database = {
 export type Profile = Database['public']['Tables']['profiles']['Row']
 export type Event = Database['public']['Tables']['events']['Row']
 export type CalcResult = Database['public']['Tables']['calc_results']['Row']
+export type Payment = Database['public']['Tables']['payments']['Row']
 export type CreditTransaction = Database['public']['Tables']['credit_transactions']['Row']

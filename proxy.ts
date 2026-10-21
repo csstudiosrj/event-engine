@@ -1,7 +1,9 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-const PUBLIC_ROUTES = ['/', '/precos', '/auth/login', '/auth/cadastro', '/auth/callback', '/estilo']
+const PUBLIC_ROUTES = ['/', '/precos', '/termos', '/privacidade', '/auth/login', '/auth/cadastro', '/auth/callback', '/auth/recuperar', '/auth/signout']
+// Rotas que tratam autenticação por conta própria (ex.: webhook do Pagar.me)
+const PUBLIC_PREFIXES = ['/calculadoras', '/api']
 const AUTH_ROUTES = ['/auth/login', '/auth/cadastro']
 
 export async function proxy(request: NextRequest) {
@@ -27,15 +29,21 @@ export async function proxy(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const path = request.nextUrl.pathname
 
+  // nextUrl.clone() preserva o basePath (/normato); new URL(path, request.url) não.
   if (user && AUTH_ROUTES.some((r) => path.startsWith(r))) {
-    return NextResponse.redirect(new URL('/painel', request.url))
+    const url = request.nextUrl.clone()
+    url.pathname = '/painel'
+    url.search = ''
+    return NextResponse.redirect(url)
   }
 
-  const isPublic = PUBLIC_ROUTES.some((r) => path === r || path.startsWith('/calculadoras'))
+  const isPublic = PUBLIC_ROUTES.includes(path) || PUBLIC_PREFIXES.some((p) => path.startsWith(p))
   if (!user && !isPublic) {
-    const loginUrl = new URL('/auth/login', request.url)
-    loginUrl.searchParams.set('next', path)
-    return NextResponse.redirect(loginUrl)
+    const url = request.nextUrl.clone()
+    url.pathname = '/auth/login'
+    url.search = ''
+    url.searchParams.set('redirectTo', path + request.nextUrl.search)
+    return NextResponse.redirect(url)
   }
 
   return supabaseResponse

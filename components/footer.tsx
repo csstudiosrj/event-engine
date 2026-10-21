@@ -1,3 +1,5 @@
+import Link from "next/link"
+
 export function Footer() {
   const year = new Date().getFullYear()
 
@@ -35,6 +37,12 @@ export function Footer() {
             Normato
           </span>
         </div>
+
+        <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-[#8ba4bc]">
+          <Link href="/precos" className="hover:text-white transition-colors">Preços</Link>
+          <Link href="/termos" className="hover:text-white transition-colors">Termos de uso</Link>
+          <Link href="/privacidade" className="hover:text-white transition-colors">Privacidade</Link>
+        </nav>
 
         {/* Legal */}
         <p className="text-sm text-[#8ba4bc] text-center md:text-right">

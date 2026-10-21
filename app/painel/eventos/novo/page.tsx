@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, ArrowRight, CheckCircle2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import { Button, ButtonLink } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Header } from '@/components/header'
@@ -11,6 +12,7 @@ import { Footer } from '@/components/footer'
 import { toast } from '@/components/ui/toast'
 import { useApp } from '@/components/app-shell'
 import { createClient } from '@/lib/supabase/client'
+import { maxActiveEvents } from '@/lib/plans'
 
 const TIPOS = ['Show','Festival','Casamento','Corporativo','Feira','Esportivo','Religioso','Bloco','Congresso','Formatura','Outro']
 const ESTADOS = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO']
@@ -52,7 +54,7 @@ function Toggle({ options, value, onChange }: { options: string[]; value: string
 export default function NovoEventoPage() {
   const router = useRouter()
   const { profile } = useApp()
-  const supabase = createClient()
+  const [supabase] = useState(() => createClient())
   const [loading, setLoading] = useState(false)
 
   const [form, setForm] = useState({
@@ -99,7 +101,15 @@ export default function NovoEventoPage() {
 
     setLoading(true)
 
-    const { error } = await supabase.from('events').insert({
+    const limite = maxActiveEvents(profile)
+    const { count } = await supabase.from('events').select('id', { count: 'exact', head: true }).eq('status', 'active')
+    if ((count ?? 0) >= limite) {
+      toast(limite === 1 ? 'Seu plano permite 1 evento ativo. Arquive o atual no painel ou assine o Pro para ter vários.' : 'Limite de eventos ativos atingido.', 'error')
+      setLoading(false)
+      return
+    }
+
+    const { data: created, error } = await supabase.from('events').insert({
       user_id: profile.id,
       name: form.name.trim(),
       type: form.type,
@@ -107,22 +117,22 @@ export default function NovoEventoPage() {
       city: form.city.trim(),
       date: form.date || null,
       duration_h: Number(form.duration_h) || 6,
-      environment: form.environment,
+      environment: form.environment as 'Aberto' | 'Fechado' | 'Misto',
       pax: Number(form.pax),
       m2: form.m2 ? Number(form.m2) : null,
-      exit_type: form.exit_type,
-      risk_level: form.risk_level,
+      exit_type: form.exit_type as 'distintas' | 'unica',
+      risk_level: form.risk_level as 'alto' | 'medio' | 'baixo',
       status: 'active',
-    })
+    }).select('id').single()
 
-    if (error) {
+    if (error || !created) {
       toast('Erro ao criar evento. Tente novamente.', 'error')
       setLoading(false)
       return
     }
 
     toast('Evento criado com sucesso!', 'success')
-    router.push('/painel')
+    router.push(`/painel?evento=${created.id}`)
   }
 
   return (
@@ -130,9 +140,9 @@ export default function NovoEventoPage() {
       <Header />
 
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 pb-16 pt-8 lg:px-8">
-        <a href="/painel" className="mb-6 flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-[#0F1B33]">
+        <Link href="/painel" className="mb-6 flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-[#0F1B33]">
           <ArrowLeft className="size-4" /> Voltar ao painel
-        </a>
+        </Link>
 
         <div className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight">Novo evento</h1>
@@ -249,9 +259,7 @@ export default function NovoEventoPage() {
           </Card>
 
           <div className="flex justify-end gap-3">
-            <a href="/painel">
-              <Button variant="outline">Cancelar</Button>
-            </a>
+            <ButtonLink href="/painel" variant="outline">Cancelar</ButtonLink>
             <Button
               onClick={handleSubmit}
               disabled={loading}

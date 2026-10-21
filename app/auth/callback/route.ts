@@ -1,36 +1,24 @@
-import { NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { NextResponse, type NextRequest } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 
-export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url)
-  const code = searchParams.get('code')
-  const next = searchParams.get('next') ?? '/painel'
+export async function GET(request: NextRequest) {
+  const code = request.nextUrl.searchParams.get('code')
+  const next = request.nextUrl.searchParams.get('next') ?? '/painel'
+
+  // nextUrl.clone() mantém o basePath /normato no redirecionamento
+  const url = request.nextUrl.clone()
+  url.search = ''
 
   if (code) {
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() { return cookieStore.getAll() },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options),
-            )
-          },
-        },
-      },
-    )
-
+    const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      // Sempre redireciona para o painel após confirmação
-      const redirectTo = next.startsWith('/') ? next : '/painel'
-      return NextResponse.redirect(`${origin}${redirectTo}`)
+      url.pathname = next.startsWith('/') && !next.startsWith('//') ? next : '/painel'
+      return NextResponse.redirect(url)
     }
   }
 
-  return NextResponse.redirect(`${origin}/auth/login?error=link_invalido`)
+  url.pathname = '/auth/login'
+  url.searchParams.set('error', 'link_invalido')
+  return NextResponse.redirect(url)
 }

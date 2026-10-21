@@ -1,6 +1,9 @@
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
+import { AppShell } from "@/components/app-shell"
+import { ToastProvider } from "@/components/ui/toast"
+import { SITE_URL } from "@/lib/config"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,17 +31,17 @@ export const metadata: Metadata = {
     "alvará evento",
     "memorial descritivo evento",
   ],
-  authors: [{ name: "Normato", url: "https://normato.com.br" }],
+  authors: [{ name: "Normato", url: SITE_URL }],
   creator: "Normato — ARXUM group",
-  metadataBase: new URL("https://normato.com.br"),
+  metadataBase: new URL(SITE_URL + "/"),
   alternates: {
-    canonical: "https://normato.com.br",
+    canonical: SITE_URL,
   },
   openGraph: {
     title: "Normato — Calcule seu evento",
     description:
       "A auditoria técnica do seu evento. Cálculos de brigada, equipe médica, sanitários e saídas de emergência em segundos.",
-    url: "https://normato.com.br",
+    url: SITE_URL,
     siteName: "Normato",
     locale: "pt_BR",
     type: "website",
@@ -61,8 +64,8 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: "/favicon.svg",
-    apple: "/apple-touch-icon.png",
+    icon: "/normato/favicon.svg",
+    apple: "/normato/apple-icon.png",
   },
 }
 
@@ -74,7 +77,8 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {children}
+        <AppShell>{children}</AppShell>
+        <ToastProvider />
       </body>
     </html>
   )
