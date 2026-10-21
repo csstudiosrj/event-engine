@@ -2,10 +2,12 @@
  * Normato – Banco de Regras Normativas
  *
  * Cada calculadora exporta um objeto `Calculadora` com suas regras.
- * Todas as regras foram auditadas por DeepSeek em outubro/2026
- * com base em pesquisa Perplexity das fontes oficiais.
+ * Revisão de outubro/2026: cada regra foi conferida no texto oficial (ou em
+ * cópia integral) indicado em `url_oficial`. Regras com `veredito: "duvidoso"`
+ * foram conferidas só em fontes secundárias. O registro completo está em
+ * FONTES.md, na raiz do repositório.
  *
- * Correções aplicadas estão documentadas em `nota_auditoria` de cada regra.
+ * Correções em relação à versão anterior estão em `nota_auditoria`.
  */
 
 export type { Calculadora, Regra, Veredito, TipoFonte } from "./types";

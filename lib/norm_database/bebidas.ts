@@ -1,60 +1,37 @@
 import type { Calculadora } from "./types";
+import { URL } from "./fontes";
 
 export const bebidas: Calculadora = {
   slug: "bebidas",
-  titulo: "Bebidas e Álcool",
-  descricao: "Regras para venda e consumo de bebidas alcoólicas em eventos",
+  titulo: "Bebidas",
+  descricao: "Regras para venda e consumo de bebidas em eventos",
   regras: [
     {
-      id: "rdc216-2004-manipulacao-bebidas",
-      descricao:
-        "Bebidas e alimentos em eventos devem seguir boas práticas de manipulação: higiene pessoal dos manipuladores, controle de temperatura, proteção contra contaminação e rastreabilidade dos insumos.",
-      fonte: "RDC 216/2004",
-      tipo_fonte: "resolucao_anvisa",
-      dispositivo: "Itens 4.1 a 4.8",
-      url_oficial:
-        "https://bvsms.saude.gov.br/bvs/saudelegis/anvisa/2004/res0216_15_09_2004.html",
-      veredito: "confirmado",
-    },
-    {
-      id: "rdc656-2022-bebidas-eventos-massa",
-      descricao:
-        "Eventos com mais de 1.000 pessoas por dia que comercializem bebidas devem seguir a RDC 656/2022: controle de temperatura, identificação de fornecedores, armazenamento adequado e descarte de embalagens.",
-      fonte: "RDC 656/2022",
-      tipo_fonte: "resolucao_anvisa",
-      dispositivo: "Arts. 1º e 2º",
-      url_oficial:
-        "https://www.gov.br/anvisa/pt-br/assuntos/noticias-anvisa/2022/anvisa-publica-norma-para-eventos-de-massa",
-      veredito: "confirmado",
-    },
-    {
-      id: "rdc717-2022-bebidas-alcoolicas",
-      descricao:
-        "Bebidas alcoólicas devem ter registro na ANVISA e obedecer aos padrões de identidade e qualidade estabelecidos pela RDC 717/2022.",
-      fonte: "RDC 717/2022",
-      tipo_fonte: "resolucao_anvisa",
-      veredito: "confirmado",
-    },
-    {
-      id: "eca-alcool-menores",
-      descricao:
-        "É proibida a venda de bebidas alcoólicas a menores de 18 anos. O organizador do evento é responsável pelo controle de acesso ao espaço de vendas e pelo treinamento de colaboradores.",
+      id: "eca-art81-243",
+      descricao: "É proibido vender, fornecer ou servir bebida alcoólica, ainda que gratuitamente, a criança ou adolescente (menores de 18 anos). A conduta é crime, com pena de detenção de 2 a 4 anos e multa.",
       fonte: "Lei 8.069/1990 (ECA)",
       tipo_fonte: "lei_federal",
-      dispositivo: "Art. 81, II",
-      url_oficial:
-        "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm",
+      dispositivo: "Arts. 81, II, e 243",
+      url_oficial: URL.eca,
       veredito: "confirmado",
     },
     {
-      id: "lei14597-2023-bebidas-eventos-esportivos",
+      id: "rdc656-eventos-massa",
       descricao:
-        "A Lei Geral do Esporte proíbe a venda de bebidas alcoólicas durante a realização de eventos esportivos em estádios e arenas, salvo exceções previstas em regulamentos específicos.",
-      fonte: "Lei 14.597/2023",
-      tipo_fonte: "lei_federal",
-      url_oficial:
-        "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/lei/l14597.htm",
+        "Eventos com mais de 1.000 pessoas por dia com manipulação ou venda de alimentos e bebidas: o formulário de avaliação prévia vai à vigilância sanitária local até 30 dias antes; organizador e contratados respondem solidariamente por danos à saúde; a autoridade pode exigir profissional habilitado para supervisão; o gelo deve ser fabricado com água potável.",
+      fonte: "RDC ANVISA 656/2022",
+      tipo_fonte: "resolucao_anvisa",
+      dispositivo: "Arts. 2º, 8º, 10 e 12; Anexo I",
+      url_oficial: URL.rdc656,
       veredito: "confirmado",
+    },
+    {
+      id: "esportes-alcool",
+      descricao: "Eventos esportivos: a venda de bebidas alcoólicas em estádios é regulada por leis estaduais e municipais, que variam entre proibição e liberação com restrições.",
+      fonte: "Legislação estadual e municipal",
+      tipo_fonte: "lei_estadual",
+      veredito: "nao_verificavel",
+      nota_auditoria: "Corrigido: a Lei 14.597/2023 (Lei Geral do Esporte) não trata de bebidas alcoólicas; a regra anterior atribuía a ela uma proibição inexistente.",
     },
   ],
 };

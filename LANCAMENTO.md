@@ -86,15 +86,7 @@ Se um pagamento não liberar créditos/plano: Pagar.me → **Webhooks** → veja
 
 ## 7. Antes de divulgar (não é código)
 
-- [ ] **Revisão técnica das fórmulas** por engenheiro de segurança do trabalho / bombeiro civil — principalmente Brigada, Saídas de emergência, Equipe médica e Segurança patrimonial. As fórmulas estão em `lib/calculators/`, cada uma com a memória de cálculo explicando o critério.
-- [ ] **Revisão das fontes** em `lib/norm_database/` (veja observações abaixo).
 - [ ] **Revisão jurídica** de `/termos` e `/privacidade`.
+- [ ] Preencher `NEXT_PUBLIC_COMPANY_CNPJ` na Vercel (aparece nos Termos e na Política).
 
-### Observações sobre o `norm_database`
-
-Algumas citações precisam ser conferidas por alguém da área antes do lançamento:
-
-- **Lei 14.967/2024** aparece como "regulamenta a organização de eventos". Essa lei é o Estatuto da Segurança Privada; o enquadramento deve ser revisto (`seguranca-patrimonial.ts`, `credenciamento.ts`).
-- **Decreto 13.012/2026** e **Decreto 13.108/2026**: não consegui verificar. Confirme número, data e artigos.
-- **Lei 14.597/2023 (Lei Geral do Esporte)**: a regra diz que "proíbe a venda de bebidas alcoólicas" em estádios; na prática isso depende de leis estaduais. A calculadora já mostra isso como alerta para confirmar localmente.
-- **NBR 9077 — 60 pessoas por unidade de passagem**: em locais de reunião a norma usa capacidades diferentes conforme o tipo de componente (porta, escada, rampa). A calculadora usa 60 (mais conservador) e compara com 1 saída de 1,20 m a cada 500 pessoas, adotando o maior valor.
+As fórmulas e as citações normativas foram pesquisadas nas fontes oficiais. O registro completo, com o que foi conferido no texto oficial, o que veio de fonte secundária e o que é referência de mercado, está em [`FONTES.md`](FONTES.md).

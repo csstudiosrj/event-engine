@@ -1,91 +1,65 @@
 import type { Calculadora } from "./types";
+import { URL } from "./fontes";
 
 export const ingressos: Calculadora = {
   slug: "ingressos",
-  titulo: "Ingressos e Meia-Entrada",
+  titulo: "Ingressos e Meia-entrada",
   descricao: "Regras para venda de ingressos e concessão de meia-entrada",
   regras: [
     {
-      id: "lei12933-2013-meia-entrada",
+      id: "lei12933-40",
       descricao:
-        "A meia-entrada (50% do valor do ingresso) é assegurada a estudantes, pessoas com deficiência e seus acompanhantes, jovens de 15 a 29 anos de baixa renda (CadÚnico) e idosos acima de 60 anos.",
-      fonte: "Lei 12.933/2013",
+        "A meia-entrada é assegurada em 40% do total de ingressos disponíveis para venda ao público em cada evento. Têm direito estudantes com Carteira de Identificação Estudantil, pessoas com deficiência e acompanhante quando necessário, e jovens de 15 a 29 anos de baixa renda inscritos no CadÚnico.",
+      fonte: "Lei 12.933/2013 e Decreto 8.537/2015",
       tipo_fonte: "lei_federal",
-      url_oficial:
-        "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2013/lei/l12933.htm",
+      dispositivo: "Lei 12.933, art. 1º, §§ 8º e 10; Decreto 8.537, art. 9º",
+      url_oficial: URL.lei12933,
       veredito: "confirmado",
+      nota_auditoria: "Corrigido: a fonte da cota de 40% é a Lei 12.933 e o Decreto 8.537, e não o Decreto 9.404/2018.",
     },
     {
-      id: "decreto8537-2015-meia-entrada-estudante",
-      descricao:
-        "Para obter meia-entrada como estudante é necessário apresentar a Carteira de Identificação Estudantil (CIE) emitida pela ANPG, UNE, UBES ou entidade estudantil estadual/municipal reconhecida.",
+      id: "dec8537-reserva-48h",
+      descricao: "Os ingressos de meia-entrada ficam reservados aos beneficiários desde o início das vendas até 48 horas antes do evento, em todos os pontos de venda. Ingressos exclusivos de sócio-torcedor não entram na base de cálculo.",
       fonte: "Decreto 8.537/2015",
       tipo_fonte: "decreto_federal",
-      url_oficial:
-        "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/decreto/d8537.htm",
+      dispositivo: "Arts. 9º, parágrafo único, e 10",
+      url_oficial: URL.dec8537,
       veredito: "confirmado",
     },
     {
-      id: "lei10741-2003-idoso-meia",
-      descricao:
-        "Pessoas com 60 anos ou mais têm direito à meia-entrada em eventos artísticos, culturais, esportivos e de lazer.",
-      fonte: "Lei 10.741/2003 (Estatuto do Idoso)",
+      id: "lei10741-art23",
+      descricao: "Pessoas com 60 anos ou mais têm desconto de pelo menos 50% nos ingressos para eventos artísticos, culturais, esportivos e de lazer, e acesso preferencial.",
+      fonte: "Lei 10.741/2003 (Estatuto da Pessoa Idosa)",
       tipo_fonte: "lei_federal",
       dispositivo: "Art. 23",
-      url_oficial:
-        "https://www.planalto.gov.br/ccivil_03/leis/2003/l10.741.htm",
+      url_oficial: URL.lei10741,
       veredito: "confirmado",
     },
     {
-      id: "lei13146-2015-pcd-meia",
+      id: "dec13108-transparencia",
       descricao:
-        "Pessoas com deficiência têm direito à meia-entrada em eventos culturais, esportivos, de lazer e entretenimento, extensível a um acompanhante quando necessário.",
-      fonte: "Lei 13.146/2015 (LBI)",
-      tipo_fonte: "lei_federal",
-      dispositivo: "Art. 48",
-      url_oficial:
-        "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm",
-      veredito: "confirmado",
-      nota_auditoria:
-        "Atenção: o art. 63 da Lei 13.146/2015 trata de acessibilidade à internet, NÃO de sanitários. A referência correta para meia-entrada de PcD é o art. 48.",
-    },
-    {
-      id: "decreto9404-2018-meia-proporcao",
-      descricao:
-        "A meia-entrada é reservada para no mínimo 40% dos ingressos disponíveis por evento ou por setor.",
-      fonte: "Decreto 9.404/2018",
-      tipo_fonte: "decreto_federal",
-      url_oficial:
-        "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/decreto/D9404.htm",
-      veredito: "confirmado",
-    },
-    {
-      id: "eca-menores-espetaculos",
-      descricao:
-        "Menores de 16 anos só podem frequentar espetáculos e diversões públicas com autorização dos pais ou responsáveis; menores de 10 anos devem estar acompanhados. Eventos classificados como impróprios para menores exigem controle de acesso por faixa etária.",
-      fonte: "Lei 8.069/1990 (ECA)",
-      tipo_fonte: "lei_federal",
-      dispositivo: "Arts. 74 a 80",
-      url_oficial:
-        "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm",
-      veredito: "confirmado",
-    },
-    {
-      id: "ecad-direitos-autorais",
-      descricao:
-        "Eventos com execução pública de músicas devem recolher direitos autorais ao ECAD. O valor é calculado sobre a receita bruta do evento.",
-      fonte: "Lei 9.610/1998 (Lei dos Direitos Autorais) + ECAD",
-      tipo_fonte: "lei_federal",
-      dispositivo: "Art. 68",
-      url_oficial: "https://www.ecad.org.br/pt/eu-faco-musica/eventos/Paginas/default.aspx",
-      veredito: "confirmado",
-    },
-    {
-      id: "decreto13108-2026-ingressos-eventos",
-      descricao:
-        "Regulamenta a venda de ingressos para eventos de entretenimento, incluindo regras para plataformas digitais, limites de taxa de serviço e política de reembolso.",
+        "Venda de ingressos (exceto eventos esportivos): informar o preço total com todas as taxas discriminadas e a quantidade total de ingressos, inclusive os de meia-entrada; taxas proporcionais ao preço para não cercear a meia-entrada; ingressos promocionais não contam para os 40%; divulgar em até 30 dias após o evento o percentual vendido como meia-entrada; direito de arrependimento nas compras on-line.",
       fonte: "Decreto 13.108/2026",
       tipo_fonte: "decreto_federal",
+      dispositivo: "Arts. 6º a 11 e 16",
+      url_oficial: URL.dec13108,
+      veredito: "confirmado",
+    },
+    {
+      id: "eca-art75",
+      descricao: "Crianças menores de 10 anos só podem entrar e permanecer em espetáculos acompanhadas dos pais ou responsável. O acesso segue a classificação indicativa do evento.",
+      fonte: "Lei 8.069/1990 (ECA)",
+      tipo_fonte: "lei_federal",
+      dispositivo: "Art. 75",
+      url_oficial: URL.eca,
+      veredito: "confirmado",
+      nota_auditoria: "Corrigido: o ECA não traz a regra de 'menores de 16 anos com autorização' citada antes.",
+    },
+    {
+      id: "ecad",
+      descricao: "Eventos com execução pública de música recolhem direitos autorais ao ECAD, conforme a tabela de preços do próprio ECAD.",
+      fonte: "Lei 9.610/1998 (Lei de Direitos Autorais), art. 68",
+      tipo_fonte: "lei_federal",
       veredito: "confirmado",
     },
   ],

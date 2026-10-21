@@ -109,7 +109,7 @@ export function CalculatorFlow({ def }: { def: CalculatorDef }) {
 
     {!bloqueado && <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
       <section className="min-w-0">
-        {step === 0 && <Card className="border-slate-200"><CardHeader><p className="text-sm font-medium text-amber-600">Etapa 1 de 4</p><CardTitle>Dados do evento</CardTitle><p className="text-sm text-slate-500">O estado define quais normas estaduais entram no resultado.</p></CardHeader><CardContent className="grid gap-5 sm:grid-cols-2">
+        {step === 0 && <Card className="border-slate-200"><CardHeader><p className="text-sm font-medium text-amber-600">Etapa 1 de 4</p><CardTitle>Dados do evento</CardTitle><p className="text-sm text-slate-500">O estado e a cidade definem quais normas entram no resultado (SP e RJ têm regras próprias; a capital do RJ, também municipais).</p></CardHeader><CardContent className="grid gap-5 sm:grid-cols-2">
           <Label text="Nome do evento"><Input className={fieldClass} value={meta.nome} onChange={(e) => setMeta({ ...meta, nome: e.target.value })} placeholder="Ex.: Festival de Inverno" /></Label>
           <Label text="Data"><Input type="date" className={fieldClass} value={meta.data} onChange={(e) => setMeta({ ...meta, data: e.target.value })} /></Label>
           <Label text="Cidade"><Input className={fieldClass} value={meta.cidade} onChange={(e) => setMeta({ ...meta, cidade: e.target.value })} placeholder="Ex.: Petrópolis" /></Label>

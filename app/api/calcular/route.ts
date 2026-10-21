@@ -36,7 +36,7 @@ export async function POST(request: Request) {
   }
 
   // Calcula antes de cobrar: se a fórmula falhar, nenhum crédito é debitado.
-  const output = calc.calcular(inputs)
+  const output = calc.calcular(inputs, { uf, cidade: String(body?.meta?.cidade ?? '') })
 
   let creditsLeft: number | null = profile.credits
   if (!planoAtivo) {

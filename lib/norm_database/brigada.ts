@@ -1,4 +1,5 @@
 import type { Calculadora } from "./types";
+import { URL } from "./fontes";
 
 export const brigada: Calculadora = {
   slug: "brigada",
@@ -6,57 +7,45 @@ export const brigada: Calculadora = {
   descricao: "Dimensionamento da brigada de incêndio para eventos",
   regras: [
     {
-      id: "nbr14276-brigada-composicao",
+      id: "sp-it17-4-11-2",
       descricao:
-        "A brigada de incêndio deve ser dimensionada conforme a classificação da edificação por risco e ocupação. O número mínimo de brigadistas é determinado por tabela da norma, considerando o número de pavimentos, área e população.",
-      fonte: "ABNT NBR 14276:2006",
-      tipo_fonte: "norma_abnt",
-      dispositivo: "Item 5",
-      veredito: "confirmado",
-    },
-    {
-      id: "nbr14276-brigadista-treinamento",
-      descricao:
-        "Brigadistas devem possuir treinamento teórico e prático em prevenção e combate a incêndio, primeiros socorros e abandono de área, com reciclagem anual.",
-      fonte: "ABNT NBR 14276:2006",
-      tipo_fonte: "norma_abnt",
-      dispositivo: "Item 6",
-      veredito: "confirmado",
-    },
-    {
-      id: "it-17-cbpmg-brigada-eventos",
-      descricao:
-        "Eventos temporários com público acima de 250 pessoas exigem brigada de incêndio com pelo menos um brigadista a cada 500 pessoas, com mínimo de 2 brigadistas.",
-      fonte: "IT 17 – CBPMG (Instrução Técnica do Corpo de Bombeiros de MG)",
+        "São Paulo: em ocupações temporárias (F-7) e locais de reunião de público (F-2, F-3, F-5, F-6, F-8, F-11), o número de brigadistas considera a população máxima: até 1.000 pessoas, no mínimo 5; de 1.000 a 2.500, no mínimo 10; de 2.500 a 5.000, no mínimo 15; de 5.000 a 10.000, no mínimo 20; acima de 10.000, acrescentar 1 brigadista para cada grupo de 500 pessoas.",
+      fonte: "IT 17/2025 – CBPMESP (Portaria CCB-003/800/25)",
       tipo_fonte: "instrucao_tecnica",
-      ufs: ["MG"],
+      dispositivo: "Item 4.11.2",
+      url_oficial: URL.spIt17,
+      ufs: ["SP"],
       veredito: "confirmado",
+      nota_auditoria: "Conferido no texto integral. Pode ser calculado pelos ingressos efetivamente à venda (item 4.11.3) e substituído por bombeiros civis contratados (item 4.11.1).",
     },
     {
-      id: "npt017-cbmpr-brigada-eventos",
+      id: "rj-nt504-tabela1",
       descricao:
-        "Paraná: a brigada de incêndio em eventos deve seguir a NPT 017 do CBMPR, com dimensionamento por faixa de público e risco da atividade.",
-      fonte: "NPT 017 – CBMPR",
+        "Rio de Janeiro: a brigada é composta por bombeiros civis e dimensionada pela área total construída (ATC) das estruturas do evento. Estrutura temporária: até 200 m² isento; 201 a 500 m², 2 BC; 501 a 2.500 m², 4 BC; acima disso, +1 BC para cada 2.500 m² acrescidos. Edificação permanente: até 500 m² isento; 501 a 2.500 m², 2 BC. No mínimo 1 BC por estrutura temporária (um BC pode atender 2 estruturas a até 60 m entre si).",
+      fonte: "NT 5-04 – CBMERJ (Portaria 1071/2019, alterada pela 1167/2022)",
       tipo_fonte: "instrucao_tecnica",
-      ufs: ["PR"],
+      dispositivo: "Item 6.1.6 e Tabela 1",
+      url_oficial: URL.rjNt504,
+      ufs: ["RJ"],
       veredito: "confirmado",
     },
     {
-      id: "rt01-2025-cbrn-brigada",
-      descricao:
-        "Rio Grande do Norte: RT 01/2025 do CBRN regulamenta brigada de incêndio em eventos temporários.",
-      fonte: "RT 01/2025 – CBRN",
+      id: "rj-nt504-extintores",
+      descricao: "Rio de Janeiro: estruturas temporárias devem ter 1 extintor para cada 100 m² de área total construída, com distância máxima de 10 m entre extintores, preferencialmente de pó ABC.",
+      fonte: "NT 5-04 – CBMERJ",
       tipo_fonte: "instrucao_tecnica",
-      ufs: ["RN"],
+      dispositivo: "Item 6.1.1",
+      url_oficial: URL.rjNt504,
+      ufs: ["RJ"],
       veredito: "confirmado",
     },
     {
-      id: "brigada-proporcao-estimativa",
+      id: "brigada-outras-ufs",
       descricao:
-        "Referência operacional geral: 1 brigadista para cada 500 pessoas (eventos de baixo risco) a 1 para cada 200 (eventos de alto risco). Cada UF tem norma própria; consultar o CBPMEUF local.",
-      fonte: "Referência operacional de mercado",
-      tipo_fonte: "estudo",
-      veredito: "confirmado",
+        "Cada estado tem instrução técnica própria para brigada em eventos (ex.: IT 33 em MG, NT 09 no DF, NTCB 06 em MT, IT 03 em AL). Para estados sem regra cadastrada, o Normato usa o critério da IT 17/2025 de São Paulo como referência.",
+      fonte: "Corpos de Bombeiros estaduais",
+      tipo_fonte: "instrucao_tecnica",
+      veredito: "nao_verificavel",
       estimativa_operacional: true,
     },
   ],

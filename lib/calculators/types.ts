@@ -25,6 +25,9 @@ export type CalcOutput = {
 
 export type Categoria = 'essencial' | 'estrategica'
 
+// Local do evento: define quais regras estaduais e municipais se aplicam
+export type CalcContext = { uf: string; cidade: string }
+
 export type Calculator = {
   slug: string
   titulo: string
@@ -33,7 +36,7 @@ export type Calculator = {
   // Slug no lib/norm_database com as regras citadas no resultado
   normSlug: string
   campos: Field[]
-  calcular: (inputs: Inputs) => CalcOutput
+  calcular: (inputs: Inputs, ctx: CalcContext) => CalcOutput
 }
 
 export type CalcResponse = CalcOutput & {

@@ -6,43 +6,22 @@ export const orcamento: Calculadora = {
   descricao: "Estrutura de orçamento consolidado para eventos",
   regras: [
     {
-      id: "orcamento-consolidado-formula",
-      descricao:
-        "Orçamento Consolidado = Soma de todos os Custos Fixos + Soma de todos os Custos Variáveis + Margem de Lucro desejada. Deve incluir reserva de contingência de 10–20% do total.",
-      fonte: "Gestão Financeira para Eventos – Proedu/IFPR",
-      tipo_fonte: "estudo",
-      url_oficial:
-        "https://proedu.rnp.br/bitstream/handle/123456789/1346/Gestao%20Financeira%20para%20Eventos.pdf",
-      veredito: "confirmado",
-      estimativa_operacional: true,
-    },
-    {
-      id: "custos-fixos-variaveis-orcamento",
-      descricao:
-        "Custos fixos típicos de eventos: espaço/venue, palco e estrutura, som e luz, cachê artístico, produção executiva. Custos variáveis típicos: alimentação por pessoa, segurança por pessoa, material gráfico por participante, recarga de brindes.",
-      fonte: "Referência operacional de mercado",
+      id: "orcamento-estrutura",
+      descricao: "Orçamento = custos fixos + custos variáveis (por participante × público) + reserva de contingência + margem desejada; a receita necessária soma os impostos sobre a receita.",
+      fonte: "Gestão financeira de eventos (prática de mercado)",
       tipo_fonte: "estudo",
       veredito: "confirmado",
       estimativa_operacional: true,
+      nota_auditoria: "A reserva de contingência de 10–20% é prática de mercado, não exigência legal.",
     },
     {
-      id: "tributos-orcamento-competencias",
+      id: "tributos-aliquotas",
       descricao:
-        "O orçamento deve prever: ISS (municipal, alíquota 2–5% sobre serviços), ICMS (estadual, sobre mercadorias), PIS/COFINS (federal, 3,65% no Simples ou 9,25% no Lucro Real). Alíquotas variam; consultar contador.",
-      fonte: "Constituição Federal/88 – arts. 153, 155 e 156",
+        "Referências de alíquota: ISS de 2% a 5% conforme o município (LC 116/2003, art. 8º, e LC 157/2016); PIS/COFINS de 3,65% no regime cumulativo (Lucro Presumido) ou 9,25% no não cumulativo (Lucro Real). No Simples Nacional os tributos são recolhidos juntos pelo DAS, com alíquota por faixa de faturamento.",
+      fonte: "Constituição Federal e legislação tributária",
       tipo_fonte: "lei_federal",
       veredito: "confirmado",
-      nota_auditoria:
-        "CORRIGIDO: versão anterior tratava ISS, ICMS e PIS/COFINS como todos municipais. Cada tributo tem ente federativo específico.",
-    },
-    {
-      id: "orcamento-sem-parametro-normativo",
-      descricao:
-        "Não existe parâmetro normativo federal de orçamento por pessoa ou por ingresso em eventos. O cálculo depende da estrutura de custos de cada evento.",
-      fonte: "Ausência de norma federal",
-      tipo_fonte: "estudo",
-      veredito: "confirmado",
-      estimativa_operacional: true,
+      nota_auditoria: "Corrigido: a versão anterior aplicava 3,65% ao Simples Nacional, o que está errado.",
     },
   ],
 };

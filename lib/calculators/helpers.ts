@@ -1,4 +1,4 @@
-import type { Field, Inputs } from './types'
+import type { CalcContext, Field, Inputs } from './types'
 
 export const n = (value: number, digits = 0) =>
   value.toLocaleString('pt-BR', { minimumFractionDigits: digits, maximumFractionDigits: digits })
@@ -42,3 +42,13 @@ export function sanitize(fields: Field[], raw: Record<string, unknown>): Inputs 
   }
   return clean
 }
+
+const semAcento = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
+
+// Capital fluminense: algumas regras valem só para eventos autorizados pela Prefeitura do Rio
+export function isRioCapital(ctx: CalcContext) {
+  return ctx.uf === 'RJ' && ['rio de janeiro', 'rio', 'rj'].includes(semAcento(ctx.cidade))
+}
+
+export const outraUfAviso = (ctx: CalcContext) =>
+  `Não há regra cadastrada para ${ctx.uf}: o cálculo usa o critério de São Paulo como referência. Confira a instrução técnica do Corpo de Bombeiros do seu estado.`

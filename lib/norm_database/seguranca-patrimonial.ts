@@ -1,49 +1,63 @@
 import type { Calculadora } from "./types";
+import { URL } from "./fontes";
 
 export const segurancaPatrimonial: Calculadora = {
   slug: "seguranca-patrimonial",
   titulo: "Segurança Patrimonial",
-  descricao: "Requisitos de segurança pública e patrimonial para eventos",
+  descricao: "Requisitos de segurança privada para eventos",
   regras: [
     {
-      id: "lei14967-2024-seguranca-eventos",
+      id: "lei14967-eventos",
       descricao:
-        "A Lei 14.967/2024 regulamenta as atividades de organização de eventos, incluindo exigências de segurança, controle de acesso e responsabilidade do organizador.",
-      fonte: "Lei 14.967/2024",
+        "Segurança de eventos é serviço de segurança privada e depende de autorização prévia da Polícia Federal. Em eventos de grande magnitude, a empresa contratada apresenta projeto de segurança à autoridade local. O mesmo profissional não pode exercer vigilância e combate a incêndio ao mesmo tempo.",
+      fonte: "Lei 14.967/2024 (Estatuto da Segurança Privada)",
       tipo_fonte: "lei_federal",
-      url_oficial:
-        "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2024/lei/l14967.htm",
+      dispositivo: "Arts. 4º, 5º (II), 8º e 10",
+      url_oficial: URL.lei14967,
       veredito: "confirmado",
+      nota_auditoria: "Corrigido: a lei é o Estatuto da Segurança Privada, e não uma lei sobre organização de eventos.",
     },
     {
-      id: "decreto13012-2026-seguranca-grande-eventos",
+      id: "dec13012-art22",
       descricao:
-        "Eventos com público superior a 1.000 pessoas devem elaborar Plano de Segurança e comunicar à autoridade policial competente com antecedência mínima de 30 dias.",
+        "Eventos com público estimado acima de 1.000 pessoas: a empresa de vigilância apresenta previamente projeto de segurança à autoridade local, com público estimado, quantidade e disposição dos vigilantes e análise de risco. Os vigilantes precisam do curso de aperfeiçoamento em segurança de eventos. A revista pessoal só é lícita mediante adesão voluntária.",
       fonte: "Decreto 13.012/2026",
       tipo_fonte: "decreto_federal",
-      dispositivo: "Art. 22, § 1º",
+      dispositivo: "Arts. 21, § 2º, e 22",
+      url_oficial: URL.dec13012,
       veredito: "confirmado",
-      nota_auditoria:
-        "CORRIGIDO (dois erros): (1) o limiar de 1.000 pessoas está no Decreto 13.012/2026 art. 22 §1º, NÃO na Lei 14.967/2024 art. 8º; (2) a referência correta é 'Art. 22' (não 'Item 22').",
+      nota_auditoria: "Corrigido: o decreto não fixa prazo de 30 dias para comunicação à polícia.",
     },
     {
-      id: "lei13675-2018-seguranca-publica",
+      id: "hsg195-stewards",
       descricao:
-        "O Sistema Único de Segurança Pública (SUSP) coordena a atuação das forças de segurança em eventos de grande porte. O organizador deve solicitar policiamento ostensivo à Secretaria de Segurança Pública do estado.",
-      fonte: "Lei 13.675/2018",
-      tipo_fonte: "lei_federal",
-      url_oficial:
-        "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13675.htm",
-      veredito: "confirmado",
-    },
-    {
-      id: "seguranca-privada-proporcao-estimativa",
-      descricao:
-        "Referência operacional: 1 segurança para cada 100-200 pessoas (baixo risco) a 1 para cada 50-100 (alto risco). O número exato depende do tipo de evento, layout do espaço e exigência do órgão de segurança pública local.",
-      fonte: "Referência operacional de mercado",
-      tipo_fonte: "estudo",
+        "Não existe fórmula fixa de seguranças por pessoa: o número sai da análise de risco, com postos em barreiras, área do palco, corredores, entradas e saídas. Cada supervisor coordena normalmente de 6 a 10 seguranças.",
+      fonte: "HSE – The Event Safety Guide (HSG195), 2ª ed.",
+      tipo_fonte: "manual",
+      dispositivo: "Parágrafos 312 a 315",
+      url_oficial: URL.hsg195,
       veredito: "confirmado",
       estimativa_operacional: true,
+    },
+    {
+      id: "saidas-monitoradas",
+      descricao: "São Paulo: as saídas finais devem ser monitoradas pessoalmente pela segurança enquanto houver público, e portas e portões sem barra antipânico devem ser controlados presencialmente pela brigada ou pela segurança.",
+      fonte: "IT 12/2025 – CBPMESP",
+      tipo_fonte: "instrucao_tecnica",
+      dispositivo: "Itens 3.2.1.17 e 3.2.1.19",
+      url_oficial: URL.spIt12,
+      ufs: ["SP"],
+      veredito: "confirmado",
+    },
+    {
+      id: "rio-dec55648-seguranca",
+      descricao: "Município do Rio de Janeiro: o evento autorizado deve usar vigilância patrimonial prestada por empresa autorizada pela Polícia Federal e obter o 'nada a opor' das Polícias Militar e Civil quando exigido.",
+      fonte: "Decreto Rio nº 55.648/2025",
+      tipo_fonte: "decreto_municipal",
+      dispositivo: "Anexos VII e VIII",
+      url_oficial: URL.rioDec55648,
+      ufs: ["RJ"],
+      veredito: "confirmado",
     },
   ],
 };

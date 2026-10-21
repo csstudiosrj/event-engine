@@ -16,7 +16,7 @@ const faq = [
   },
   {
     q: "Quais estados estão disponíveis?",
-    a: "Todos os estados usam as regras federais. Há regras estaduais cadastradas para RJ, SP, MG, PR e RN, e a cobertura está em expansão. Confira sempre a instrução técnica do Corpo de Bombeiros do seu estado.",
+    a: "Todos os estados usam as regras federais. São Paulo e Rio de Janeiro têm as instruções técnicas do Corpo de Bombeiros cadastradas por completo (brigada, saídas de emergência, atendimento médico e acesso). Nos demais estados usamos o critério de São Paulo como referência e avisamos isso no resultado.",
   },
   {
     q: "Preciso saber alguma norma técnica para usar?",

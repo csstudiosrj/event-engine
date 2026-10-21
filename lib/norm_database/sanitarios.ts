@@ -1,4 +1,5 @@
 import type { Calculadora } from "./types";
+import { URL } from "./fontes";
 
 export const sanitarios: Calculadora = {
   slug: "sanitarios",
@@ -6,48 +7,69 @@ export const sanitarios: Calculadora = {
   descricao: "Dimensionamento de instalações sanitárias para eventos",
   regras: [
     {
-      id: "nr24-sanitarios-quantidade-minima",
+      id: "rio-dec55648-banheiros-quimicos",
       descricao:
-        "1 vaso sanitário para cada 20 trabalhadores homens e 1 para cada 20 mulheres; 1 lavatório para cada 10 trabalhadores; 1 chuveiro para cada 10 trabalhadores em atividades insalubres.",
-      fonte: "NR-24",
+        "Município do Rio de Janeiro: o organizador declara a instalação de, no mínimo, 1 módulo masculino e 1 módulo feminino para cada 150 pessoas, com pelo menos 10% dos módulos adaptados para cadeira de rodas ou mobilidade reduzida.",
+      fonte: "Decreto Rio nº 55.648/2025",
+      tipo_fonte: "decreto_municipal",
+      dispositivo: "Anexo VI (autodeclaração)",
+      url_oficial: URL.rioDec55648,
+      ufs: ["RJ"],
+      veredito: "confirmado",
+      nota_auditoria: "Vale para eventos autorizados pela Prefeitura do Rio de Janeiro (capital). Conferido no texto publicado no DO Rio.",
+    },
+    {
+      id: "rj-lei5705-banheiros-adaptados",
+      descricao:
+        "Estado do Rio de Janeiro: eventos públicos ou privados que ofereçam banheiros químicos devem ter no mínimo 10% de unidades acessíveis, com lavatório, e ao menos 1 unidade acessível mesmo quando o cálculo der fração menor que 1.",
+      fonte: "Lei Estadual RJ nº 5.705/2010, alterada pela Lei nº 11.169/2026",
+      tipo_fonte: "lei_estadual",
+      ufs: ["RJ"],
+      veredito: "duvidoso",
+      nota_auditoria: "Redação de 2026 conferida apenas em fontes secundárias (LegisWeb); confirmar no DOERJ de 29/04/2026.",
+    },
+    {
+      id: "nr24-trabalhadores",
+      descricao:
+        "Equipe de trabalho: 1 instalação sanitária (bacia e lavatório) para cada grupo de 20 trabalhadores ou fração, separadas por sexo. Em trabalho temporário em logradouro público podem ser usados banheiros químicos com higienização diária.",
+      fonte: "NR-24 (Portaria SEPRT 1.066/2019)",
       tipo_fonte: "norma_regulamentadora",
-      dispositivo: "Item 24.1",
-      url_oficial:
-        "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadoras/normas-regulamentadoras-vigentes/norma-regulamentadora-no-24-nr-24",
+      dispositivo: "Itens 24.2.2 e Anexo II, item 2.1",
+      url_oficial: URL.nr24,
       veredito: "confirmado",
+      nota_auditoria: "Corrigido: o lavatório para cada 10 trabalhadores (24.2.2.1) só se aplica a atividades com material infectante, tóxico ou poeira.",
     },
     {
-      id: "nbr9050-sanitarios-acessibilidade",
+      id: "hsg195-proporcao-publico",
       descricao:
-        "Pelo menos 5% dos sanitários, com mínimo de um, devem ser acessíveis a pessoas com deficiência ou mobilidade reduzida.",
-      fonte: "ABNT NBR 9050:2020",
-      tipo_fonte: "norma_abnt",
-      dispositivo: "Item 7.1",
-      veredito: "confirmado",
-    },
-    {
-      id: "lei10098-2000-sanitarios-acessibilidade",
-      descricao:
-        "Sanitários em locais de uso público devem garantir acessibilidade a pessoas com deficiência, com espaço de manobra e barras de apoio.",
-      fonte: "Lei 10.098/2000",
-      tipo_fonte: "lei_federal",
-      dispositivo: "Arts. 11 e 12",
-      url_oficial:
-        "https://www.planalto.gov.br/ccivil_03/leis/l10098.htm",
-      veredito: "confirmado",
-      nota_auditoria:
-        "Corrigido: referência anterior listava arts. 2º, 13 e 17 (genéricos); arts. 11 e 12 são os dispositivos específicos para sanitários em vias e espaços públicos.",
-    },
-    {
-      id: "sanitarios-proporcao-publico-estimativa",
-      descricao:
-        "Referência operacional: 1 banheiro químico para cada 50-100 pessoas por 4 horas de evento. Não há parâmetro normativo federal fixo; o valor varia por tipo de evento e duração.",
-      fonte: "Referência operacional de mercado",
-      tipo_fonte: "estudo",
+        "Referência técnica (HSE, Reino Unido) para eventos musicais: com abertura de portões de 6 h ou mais, 1 sanitário para cada 100 mulheres e, para homens, 1 sanitário para cada 500 mais 1 mictório para cada 150. Com menos de 6 h: 1 para cada 120 mulheres; 1 para cada 600 homens mais 1 mictório para cada 175. Sem dados do público, considerar 50% de cada sexo.",
+      fonte: "HSE – The Event Safety Guide (HSG195), 2ª ed.",
+      tipo_fonte: "manual",
+      dispositivo: "Parágrafos 515 a 518",
+      url_oficial: URL.hsg195,
       veredito: "confirmado",
       estimativa_operacional: true,
-      nota_auditoria:
-        "Não existe lei federal que fixe proporção sanitários/público em eventos. Valor deve ser apresentado como estimativa, não como exigência legal.",
+      nota_auditoria: "Não há proporção federal no Brasil. Usada quando não existe regra municipal. O guia avisa que os números podem ser baixos para eventos com alto consumo de bebidas.",
+    },
+    {
+      id: "hsg195-lavatorios",
+      descricao: "Lavatórios na proporção de 1 para cada 5 sanitários, e nunca menos de 1 para cada 10 sanitários.",
+      fonte: "HSE – The Event Safety Guide (HSG195), 2ª ed.",
+      tipo_fonte: "manual",
+      dispositivo: "Parágrafo 519",
+      url_oficial: URL.hsg195,
+      veredito: "confirmado",
+      estimativa_operacional: true,
+    },
+    {
+      id: "nbr9050-sanitarios-acessiveis",
+      descricao:
+        "Sanitários acessíveis: 5% do total de cada peça sanitária, com no mínimo 1, divididos por sexo quando houver separação.",
+      fonte: "ABNT NBR 9050:2020",
+      tipo_fonte: "norma_abnt",
+      dispositivo: "Seção 7 (sanitários)",
+      veredito: "duvidoso",
+      nota_auditoria: "Norma paga; percentual conferido em fontes secundárias. Aplicado fora do RJ, onde vale a lei estadual de 10%.",
     },
   ],
 };

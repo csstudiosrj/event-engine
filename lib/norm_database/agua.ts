@@ -1,4 +1,5 @@
 import type { Calculadora } from "./types";
+import { URL } from "./fontes";
 
 export const agua: Calculadora = {
   slug: "agua",
@@ -6,47 +7,50 @@ export const agua: Calculadora = {
   descricao: "Requisitos de água potável para eventos",
   regras: [
     {
-      id: "portaria888-2021-potabilidade",
+      id: "dec13109-agua-gratis",
       descricao:
-        "A água fornecida para consumo humano em eventos deve atender aos padrões de potabilidade da Portaria GM/MS 888/2021: cloro residual livre entre 0,2 e 5 mg/L, turbidez máxima de 5 NTU e pH entre 6,0 e 9,5.",
-      fonte: "Portaria GM/MS 888/2021",
-      tipo_fonte: "portaria",
-      url_oficial:
-        "https://bvsms.saude.gov.br/bvs/saudelegis/gm/2021/prt0888_04_05_2021.html",
+        "Eventos abertos ao público devem permitir a entrada com garrafas de água de uso pessoal. Acima de 1.000 participantes previstos, é obrigatório oferecer água potável gratuita (bebedouros ou embalagens individuais) em pontos de fácil acesso, dimensionados pela estrutura do local e pelo público. Vender água não afasta a obrigação.",
+      fonte: "Decreto 13.109/2026",
+      tipo_fonte: "decreto_federal",
+      dispositivo: "Arts. 3º, 4º e 5º",
+      url_oficial: URL.dec13109,
       veredito: "confirmado",
     },
     {
-      id: "rdc656-2022-agua-eventos-massa",
-      descricao:
-        "Eventos com mais de 1.000 pessoas por dia devem garantir o fornecimento de água potável em quantidade suficiente, com pontos de distribuição identificados e acessíveis.",
-      fonte: "RDC 656/2022",
-      tipo_fonte: "resolucao_anvisa",
-      dispositivo: "Art. 12, § 6º",
-      url_oficial:
-        "https://www.gov.br/anvisa/pt-br/assuntos/noticias-anvisa/2022/anvisa-publica-norma-para-eventos-de-massa",
-      veredito: "confirmado",
-      nota_auditoria:
-        "Corrigido: referência anterior citava 'Art. 1º, § 6º' (não existe); o dispositivo correto é art. 12, § 6º.",
-    },
-    {
-      id: "rdc656-2022-reservatorio-higienizacao",
-      descricao:
-        "Reservatórios de água em eventos de massa devem ser higienizados antes do evento e inspecionados durante o evento.",
-      fonte: "RDC 656/2022",
-      tipo_fonte: "resolucao_anvisa",
-      dispositivo: "Art. 28",
-      url_oficial:
-        "https://www.gov.br/anvisa/pt-br/assuntos/noticias-anvisa/2022/anvisa-publica-norma-para-eventos-de-massa",
-      veredito: "confirmado",
-    },
-    {
-      id: "agua-por-pessoa-estimativa",
-      descricao:
-        "Referência operacional: mínimo de 2 L de água potável por pessoa por hora de evento (consumo + higiene). Não há parâmetro normativo federal fixo; o valor depende da temperatura, tipo de evento e duração.",
-      fonte: "Referência operacional de mercado",
-      tipo_fonte: "estudo",
+      id: "hsg195-pontos",
+      descricao: "Referência técnica para eventos ao ar livre de um dia: 1 ponto de água para cada 3.000 pessoas, mais 1 para cada 10 operadores de alimentação na mesma área.",
+      fonte: "HSE – The Event Safety Guide (HSG195), 2ª ed.",
+      tipo_fonte: "manual",
+      dispositivo: "Parágrafo 472",
+      url_oficial: URL.hsg195,
       veredito: "confirmado",
       estimativa_operacional: true,
+    },
+    {
+      id: "portaria888-potabilidade",
+      descricao: "Água para consumo humano: cloro residual livre entre 0,2 e 5 mg/L, turbidez até 5 uT e pH recomendado entre 6,0 e 9,0.",
+      fonte: "Portaria GM/MS 888/2021 (Anexo XX da Portaria de Consolidação nº 5/2017)",
+      tipo_fonte: "portaria",
+      veredito: "duvidoso",
+      nota_auditoria: "Valores conferidos em relatórios oficiais de qualidade da água; há divergência sobre o pH (alguns citam 6,0–9,5).",
+    },
+    {
+      id: "rdc656-reservatorios",
+      descricao: "Em eventos de massa, reservatórios de água potável devem ser de material adequado, higienizados, tampados e continuamente abastecidos.",
+      fonte: "RDC ANVISA 656/2022",
+      tipo_fonte: "resolucao_anvisa",
+      dispositivo: "Art. 27, parágrafo único",
+      url_oficial: URL.rdc656,
+      veredito: "confirmado",
+    },
+    {
+      id: "rio-calor-extremo",
+      descricao: "Município do Rio de Janeiro: nos níveis de calor 4 e 5, eventos externos acima de 2.000 pessoas podem ser cancelados se não adotarem medidas como água potável gratuita, sombra e áreas de resfriamento.",
+      fonte: "Decreto Rio nº 55.648/2025 (Anexo X) e Decreto Rio nº 54.740/2024",
+      tipo_fonte: "decreto_municipal",
+      url_oficial: URL.rioDec55648,
+      ufs: ["RJ"],
+      veredito: "confirmado",
     },
   ],
 };

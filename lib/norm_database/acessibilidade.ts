@@ -1,4 +1,5 @@
 import type { Calculadora } from "./types";
+import { URL } from "./fontes";
 
 export const acessibilidade: Calculadora = {
   slug: "acessibilidade",
@@ -6,56 +7,50 @@ export const acessibilidade: Calculadora = {
   descricao: "Requisitos de acessibilidade para eventos",
   regras: [
     {
-      id: "lei13146-2015-acessibilidade-eventos",
+      id: "dec5296-art23",
       descricao:
-        "Eventos devem garantir acessibilidade plena a pessoas com deficiência: acesso, circulação, comunicação e participação em igualdade de condições.",
-      fonte: "Lei 13.146/2015 (LBI – Lei Brasileira de Inclusão)",
-      tipo_fonte: "lei_federal",
-      dispositivo: "Arts. 42 a 54",
-      url_oficial:
-        "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm",
+        "Teatros, estádios, ginásios, locais de espetáculos e similares: até 1.000 lugares, 2% de espaços para cadeira de rodas (mínimo 1) e 2% de assentos para pessoas com deficiência ou mobilidade reduzida (mínimo 1). Acima de 1.000 lugares, 20 espaços mais 1% do que exceder 1.000, e 20 assentos mais 1% do que exceder 1.000. Metade dos assentos reservados deve servir a pessoas obesas. Todos com lugar para acompanhante ao lado.",
+      fonte: "Decreto 5.296/2004, art. 23 (redação do Decreto 9.404/2018), regulamentando a Lei 13.146/2015, art. 44",
+      tipo_fonte: "decreto_federal",
+      dispositivo: "Art. 23, § 1º, I e II, §§ 2º e 3º",
+      url_oficial: URL.dec5296,
       veredito: "confirmado",
-      nota_auditoria:
-        "ATENÇÃO: o art. 63 da LBI trata de acessibilidade à internet, NÃO de sanitários. Nunca citar art. 63 como base para sanitários acessíveis.",
+      nota_auditoria: "Corrigido: o Decreto 9.404/2018 trata destes percentuais, e não de meia-entrada.",
     },
     {
-      id: "lei10098-2000-acessibilidade-logradouros",
-      descricao:
-        "Espaços de uso público devem garantir acesso e circulação a pessoas com deficiência ou mobilidade reduzida, incluindo rampas, corrimãos, piso tátil e sinalização.",
-      fonte: "Lei 10.098/2000",
+      id: "lei13146-art44-rotas",
+      descricao: "Os espaços reservados devem ficar distribuídos em locais de boa visibilidade, próximos aos corredores, sem segregação, e o local deve ter rotas de fuga e saídas de emergência acessíveis.",
+      fonte: "Lei 13.146/2015 (LBI)",
       tipo_fonte: "lei_federal",
-      dispositivo: "Arts. 11 e 12",
-      url_oficial:
-        "https://www.planalto.gov.br/ccivil_03/leis/l10098.htm",
+      dispositivo: "Art. 44, §§ 1º e 4º",
+      url_oficial: URL.lei13146,
       veredito: "confirmado",
-      nota_auditoria:
-        "Corrigido: referência anterior listava arts. 2º, 13 e 17 (genéricos). Arts. 11 e 12 são os dispositivos específicos para acessibilidade em espaços e vias públicas.",
     },
     {
-      id: "nbr9050-2020-acessibilidade-eventos",
-      descricao:
-        "A NBR 9050:2020 regulamenta as condições de acessibilidade: rampas (inclinação máxima 8,33%), corrimãos, sanitários acessíveis (5% dos boxes, mínimo 1), vagas de estacionamento (2% do total, mínimo 1), assentos reservados (2% das poltronas, mínimo 1), espaços para cadeirantes e área de fuga.",
+      id: "lei13146-art47-vagas",
+      descricao: "Estacionamentos abertos ao público: 2% das vagas para veículos que transportem pessoa com deficiência com mobilidade comprometida, com no mínimo 1 vaga sinalizada, próxima aos acessos.",
+      fonte: "Lei 13.146/2015 (LBI)",
+      tipo_fonte: "lei_federal",
+      dispositivo: "Art. 47, § 1º",
+      url_oficial: URL.lei13146,
+      veredito: "confirmado",
+    },
+    {
+      id: "lei10741-art41-vagas",
+      descricao: "Reserva de 5% das vagas de estacionamentos públicos e privados para pessoas idosas, nos termos da lei local.",
+      fonte: "Lei 10.741/2003 (Estatuto da Pessoa Idosa)",
+      tipo_fonte: "lei_federal",
+      dispositivo: "Art. 41",
+      url_oficial: URL.lei10741,
+      veredito: "confirmado",
+    },
+    {
+      id: "nbr9050-rampas-sanitarios",
+      descricao: "Rampas com inclinação máxima de 8,33% e sanitários acessíveis em 5% do total de cada peça (mínimo 1).",
       fonte: "ABNT NBR 9050:2020",
       tipo_fonte: "norma_abnt",
-      veredito: "confirmado",
-    },
-    {
-      id: "manual-mdh-acessibilidade-eventos",
-      descricao:
-        "O Manual de Acessibilidade do MDH orienta sobre intérpretes de Libras, audiodescrição, materiais em braille e outras adaptações para eventos culturais.",
-      fonte: "Manual de Acessibilidade – MDH",
-      tipo_fonte: "manual",
-      url_oficial:
-        "https://www.gov.br/mdh/pt-br/navegue-por-temas/pessoa-com-deficiencia/publicacoes/",
-      veredito: "confirmado",
-    },
-    {
-      id: "acessibilidade-vagas-estacionamento",
-      descricao:
-        "2% das vagas de estacionamento devem ser reservadas para PcD, com mínimo de 1 vaga, próximas às entradas, com sinalização horizontal e vertical.",
-      fonte: "ABNT NBR 9050:2020 + Lei 13.146/2015",
-      tipo_fonte: "norma_abnt",
-      veredito: "confirmado",
+      veredito: "duvidoso",
+      nota_auditoria: "Norma paga; valores conferidos em fontes secundárias. Nas saídas de emergência de eventos em SP, a IT 12/2025 admite rampas de até 10%.",
     },
   ],
 };

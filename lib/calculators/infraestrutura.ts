@@ -1,10 +1,7 @@
 import type { Calculator } from './types'
-import { duracaoField, n, num, publicoField, str, up } from './helpers'
+import { duracaoField, isRioCapital, n, num, publicoField, str, up } from './helpers'
 
-const consumoAlcoolField = {
-  key: 'alcool', label: 'Consumo de bebida alcoólica', type: 'select' as const, default: 'medio',
-  options: [{ value: 'baixo', label: 'Baixo ou nenhum' }, { value: 'medio', label: 'Médio' }, { value: 'alto', label: 'Alto (open bar, festival)' }],
-}
+// ─── Sanitários ─────────────────────────────────────────────────────────────
 
 export const sanitarios: Calculator = {
   slug: 'sanitarios',
@@ -15,98 +12,123 @@ export const sanitarios: Calculator = {
   campos: [
     publicoField,
     duracaoField,
-    { key: 'mulheres', label: 'Mulheres no público', type: 'number', default: 50, min: 0, max: 100, unit: '%' },
-    consumoAlcoolField,
+    { key: 'mulheres', label: 'Mulheres no público', type: 'number', default: 50, min: 0, max: 100, unit: '%', help: 'Sem dados, use 50%.' },
+    { key: 'alcool', label: 'Consumo de bebidas', type: 'select', default: 'medio', options: [{ value: 'baixo', label: 'Baixo ou nenhum' }, { value: 'medio', label: 'Médio' }, { value: 'alto', label: 'Alto (open bar, festival)' }] },
     { key: 'equipe', label: 'Equipe de trabalho no evento', type: 'number', default: 50, min: 0, max: 50000, unit: 'pessoas' },
   ],
-  calcular(i) {
+  calcular(i, ctx) {
     const publico = num(i, 'publico')
     const duracao = num(i, 'duracao')
     const w = num(i, 'mulheres') / 100
-    const alcool = str(i, 'alcool')
     const equipe = num(i, 'equipe')
+    const mulheres = Math.round(publico * w)
+    const homens = publico - mulheres
+    const memoria: string[] = []
+    const alertas: string[] = []
+    let fem: number
+    let mascCabines: number
+    let mictorios: number
+    let estimativa = true
 
-    const fDuracao = duracao <= 4 ? 1 : duracao <= 8 ? 1.25 : 1.5
-    const fAlcool = alcool === 'alto' ? 1.3 : alcool === 'medio' ? 1.15 : 1
-    const base = publico / 75
-    const total = Math.max(2, up(base * fDuracao * fAlcool))
-    // Mulheres levam mais tempo por uso: peso 1,5 na divisão das unidades
-    const pesoF = w * 1.5
-    const fem = w === 0 ? 0 : Math.max(1, Math.round((total * pesoF) / (pesoF + (1 - w))))
-    const masc = Math.max(w === 1 ? 0 : 1, total - fem)
-    const mictorios = Math.floor(masc / 2)
-    const cabinesMasc = masc - mictorios
-    const acessiveis = Math.max(1, up(total * 0.05))
-    const lavatorios = up(total / 2)
-    const equipeVasos = equipe > 0 ? up(equipe / 20) : 0
-    const equipeLavatorios = equipe > 0 ? up(equipe / 10) : 0
+    if (isRioCapital(ctx)) {
+      const blocos = up(publico / 150)
+      fem = blocos
+      mascCabines = blocos
+      mictorios = 0
+      estimativa = false
+      memoria.push(`Decreto Rio 55.648/2025, Anexo VI: no mínimo 1 módulo masculino e 1 feminino para cada 150 pessoas → ${n(publico)} ÷ 150 = ${blocos} de cada.`)
+    } else {
+      const longo = duracao >= 6
+      const [porF, porM, porMic] = longo ? [100, 500, 150] : [120, 600, 175]
+      fem = mulheres > 0 ? up(mulheres / porF) : 0
+      mascCabines = homens > 0 ? up(homens / porM) : 0
+      mictorios = homens > 0 ? up(homens / porMic) : 0
+      memoria.push(
+        'Não há proporção federal para o público de eventos. Usada a referência do guia HSG195 (HSE, Reino Unido), parágrafo 518.',
+        `Evento ${longo ? 'com 6 horas ou mais' : 'com menos de 6 horas'}: 1 sanitário a cada ${porF} mulheres; para homens, 1 sanitário a cada ${porM} mais 1 mictório a cada ${porMic}.`,
+        `Mulheres (${n(w * 100)}%): ${n(mulheres)} ÷ ${porF} = ${fem}. Homens: ${n(homens)} ÷ ${porM} = ${mascCabines} sanitários e ${n(homens)} ÷ ${porMic} = ${mictorios} mictórios.`,
+      )
+      if (str(i, 'alcool') === 'alto') alertas.push('Com consumo alto de bebidas, o próprio guia HSG195 avisa que estes números podem ser baixos. Considere ampliar e prever limpeza mais frequente.')
+      if (ctx.uf === 'RJ') alertas.push('Fora da capital, confira se a prefeitura do município tem proporção própria (na capital vale 1 masculino + 1 feminino a cada 150 pessoas).')
+    }
+
+    const total = fem + mascCabines + mictorios
+    const pctAcess = ctx.uf === 'RJ' ? 0.1 : 0.05
+    const acessiveis = Math.max(1, up((fem + mascCabines) * pctAcess))
+    const lavatorios = Math.max(1, up(total / 5))
+    const equipeF = up((equipe * w) / 20)
+    const equipeM = up((equipe * (1 - w)) / 20)
+    memoria.push(
+      ctx.uf === 'RJ'
+        ? `Acessíveis: 10% das cabines, mínimo 1 (Lei estadual RJ 5.705/2010, com redação de 2026) → ${acessiveis}, dentro do total.`
+        : `Acessíveis: 5% das cabines, mínimo 1 (NBR 9050) → ${acessiveis}, dentro do total.`,
+      `Lavatórios: 1 a cada 5 sanitários (HSG195, parágrafo 519) → ${lavatorios}.`,
+      equipe > 0 ? `Equipe (NR-24, item 24.2.2): 1 instalação com bacia e lavatório a cada 20 trabalhadores, por sexo → ${equipeF} feminina(s) e ${equipeM} masculina(s), separadas das do público.` : 'Sem equipe informada.',
+    )
+    alertas.push('Banheiros químicos acessíveis precisam de área de manobra, barras de apoio e acesso sem degraus, próximos às áreas reservadas a pessoas com deficiência.')
 
     return {
       destaques: [
-        { label: 'Unidades para o público', value: n(total) },
-        { label: 'Femininas', value: n(fem) },
-        { label: 'Masculinas (cabines + mictórios)', value: `${n(cabinesMasc)} + ${n(mictorios)}` },
-        { label: 'Acessíveis (PcD)', value: n(acessiveis) },
+        { label: 'Total para o público', value: n(total) },
+        { label: 'Femininos', value: n(fem) },
+        { label: 'Masculinos', value: mictorios > 0 ? `${n(mascCabines)} + ${n(mictorios)} mictórios` : n(mascCabines) },
+        { label: 'Acessíveis (incluídos)', value: n(acessiveis) },
         { label: 'Lavatórios', value: n(lavatorios) },
       ],
-      detalhes: [
-        ['Vasos exclusivos da equipe (NR-24)', n(equipeVasos)],
-        ['Lavatórios exclusivos da equipe (NR-24)', n(equipeLavatorios)],
-      ],
-      memoria: [
-        `Referência de mercado: 1 unidade a cada 50–100 pessoas por 4 horas. Adotado 1 a cada 75 → ${n(publico)} ÷ 75 = ${n(base, 1)}.`,
-        `Fator de duração (${duracao} h): ×${n(fDuracao, 2)}. Fator de consumo de álcool (${alcool}): ×${n(fAlcool, 2)}.`,
-        `Total: ${n(base, 1)} × ${n(fDuracao, 2)} × ${n(fAlcool, 2)} = ${total} unidades (mínimo 2).`,
-        `Divisão por gênero com peso 1,5 para o público feminino (${n(w * 100)}%): ${fem} femininas e ${masc} masculinas, até metade das masculinas como mictórios.`,
-        `Acessíveis: 5% do total, mínimo 1 (NBR 9050) → ${acessiveis}, contados dentro do total.`,
-        `Equipe (NR-24): 1 vaso a cada 20 e 1 lavatório a cada 10 trabalhadores → ${equipeVasos} vasos e ${equipeLavatorios} lavatórios.`,
-      ],
-      alertas: [
-        'Não existe lei federal que fixe a proporção de sanitários para o público em eventos: o número é uma estimativa. Confira se o município ou o Corpo de Bombeiros tem exigência própria.',
-        'Sanitários acessíveis precisam de área de manobra e barras de apoio (Lei 10.098/2000 e NBR 9050).',
-      ],
-      estimativa: true,
+      detalhes: [['Sanitários exclusivos da equipe (NR-24)', n(equipeF + equipeM)]],
+      memoria,
+      alertas,
+      estimativa,
     }
   },
 }
 
+// ─── Água potável ───────────────────────────────────────────────────────────
+
 export const agua: Calculator = {
   slug: 'agua',
   titulo: 'Água potável',
-  sub: 'Volume e pontos de distribuição',
+  sub: 'Pontos de distribuição e volume para consumo',
   categoria: 'essencial',
   normSlug: 'agua',
   campos: [
     publicoField,
     duracaoField,
-    { key: 'clima', label: 'Clima esperado', type: 'select', default: 'ameno', options: [{ value: 'ameno', label: 'Ameno' }, { value: 'quente', label: 'Quente (acima de 30 °C)' }] },
+    { key: 'clima', label: 'Clima esperado', type: 'select', default: 'ameno', options: [{ value: 'ameno', label: 'Ameno' }, { value: 'quente', label: 'Quente (acima de 30 °C) ou público dançando' }] },
+    { key: 'operadores', label: 'Operadores de alimentação (barracas, food trucks)', type: 'number', default: 0, min: 0, max: 5000 },
   ],
-  calcular(i) {
+  calcular(i, ctx) {
     const publico = num(i, 'publico')
     const duracao = num(i, 'duracao')
     const quente = str(i, 'clima') === 'quente'
-    const fator = quente ? 1.5 : 1
-    const litros = publico * duracao * 2 * fator
-    const pontos = Math.max(1, up(publico / 500))
-    const reservatorio = litros / 1000
-    const alertas = ['A água deve atender à Portaria GM/MS 888/2021: cloro residual livre entre 0,2 e 5 mg/L, turbidez até 5 NTU e pH entre 6,0 e 9,5.']
-    if (publico > 1000) alertas.push('Mais de 1.000 pessoas por dia: a RDC 656/2022 exige pontos de água identificados e reservatórios higienizados antes e inspecionados durante o evento.')
+    const operadores = num(i, 'operadores')
+    const litrosHora = quente ? 0.5 : 0.25
+    const litros = up(publico * duracao * litrosHora)
+    const pontosPublico = Math.max(1, up(publico / 3000))
+    const pontosOperadores = operadores > 0 ? up(operadores / 10) : 0
+    const alertas: string[] = []
+    if (publico > 1000) alertas.push('Acima de 1.000 participantes é obrigatório oferecer água potável gratuita, em bebedouros ou embalagens individuais, em pontos de fácil acesso (Decreto 13.109/2026, art. 4º). Vender água não dispensa a obrigação.')
+    alertas.push('O público pode entrar com garrafa de água de uso pessoal; restrições de material só por segurança e avisadas antes (Decreto 13.109/2026, art. 3º).')
+    if (ctx.uf === 'RJ') alertas.push('Na capital do RJ, em dias de calor nível 4 ou 5, eventos externos acima de 2.000 pessoas precisam de água gratuita, sombra e áreas de resfriamento, ou podem ser cancelados.')
+    alertas.push('Reservatórios temporários devem ser higienizados, tampados e continuamente abastecidos (RDC 656/2022, art. 27).')
     return {
       destaques: [
-        { label: 'Volume total', value: n(litros), unit: 'litros' },
-        { label: 'Reservatório equivalente', value: n(reservatorio, 1), unit: 'm³' },
-        { label: 'Pontos de distribuição', value: n(pontos) },
+        { label: 'Pontos de água para o público', value: n(pontosPublico) },
+        { label: 'Pontos para operadores de alimentação', value: n(pontosOperadores) },
+        { label: 'Água para beber (estimativa)', value: n(litros), unit: 'litros' },
       ],
       memoria: [
-        `Referência: 2 L por pessoa por hora (consumo + higiene)${quente ? ', ×1,5 por clima quente' : ''}.`,
-        `${n(publico)} pessoas × ${duracao} h × ${n(2 * fator, 1)} L = ${n(litros)} L.`,
-        `1 ponto de distribuição a cada 500 pessoas → ${pontos}.`,
+        `Pontos: 1 a cada 3.000 pessoas e 1 a cada 10 operadores de alimentação (HSG195, parágrafo 472) → ${pontosPublico} + ${pontosOperadores}.`,
+        `Consumo para beber (referência de mercado, sem norma): ${n(litrosHora, 2)} L por pessoa por hora (${quente ? 'calor ou atividade física' : 'clima ameno'}) × ${n(publico)} × ${duracao} h = ${n(litros)} L.`,
+        'O volume não inclui água para limpeza, cozinhas e sanitários com descarga.',
       ],
       alertas,
       estimativa: true,
     }
   },
 }
+
+// ─── Geradores ──────────────────────────────────────────────────────────────
 
 const GERADORES_KVA = [20, 40, 55, 81, 115, 150, 180, 260, 360, 450, 500, 750, 1000]
 
@@ -126,22 +148,28 @@ export const geradores: Calculator = {
     duracaoField,
     { key: 'redundancia', label: 'Gerador reserva (N+1)?', type: 'select', default: 'sim', options: [{ value: 'sim', label: 'Sim, recomendado' }, { value: 'nao', label: 'Não' }] },
   ],
-  calcular(i) {
+  calcular(i, ctx) {
     const cargas = ['som', 'luz', 'video', 'cozinha', 'clima', 'outros'].map((k) => num(i, k))
     const kw = cargas.reduce((a, b) => a + b, 0)
     const duracao = num(i, 'duracao')
     const simultaneidade = 0.8
     const fp = 0.8
-    const reserva = 1.25
-    const kva = (kw * simultaneidade / fp) * reserva
+    const kva = (kw * simultaneidade / fp) * 1.25
     const maior = GERADORES_KVA[GERADORES_KVA.length - 1]
     let unidades = 1
     let tamanho = GERADORES_KVA.find((g) => g >= kva) ?? maior
     if (kva > maior) { unidades = up(kva / maior); tamanho = maior }
     const reservaN1 = str(i, 'redundancia') === 'sim'
     const total = unidades + (reservaN1 ? 1 : 0)
-    const litrosHora = kw * simultaneidade * 0.27
-    const litros = litrosHora * duracao * 1.1
+    const kwh = kw * simultaneidade * duracao
+    const litros = kwh * 0.28 * 1.1
+    const carga = (kw * simultaneidade) / (tamanho * unidades * fp)
+    const alertas = [
+      'Instalações elétricas temporárias seguem a NR-10 e a NBR 5410, com aterramento e projeto e ART de profissional habilitado.',
+      'O levantamento de cargas real vem dos fornecedores de som, luz, vídeo e cozinha; os valores sugeridos são só ponto de partida.',
+    ]
+    if (carga < 0.5) alertas.push(`O gerador vai operar com cerca de ${n(carga * 100)}% da capacidade. Abaixo de 50% o consumo por kWh sobe e o motor pode acumular resíduos: avalie um modelo menor ou dividir a carga.`)
+    if (ctx.uf === 'RJ') alertas.push('No RJ, motogeradores seguem a NT 3-03 do CBMERJ (inclusive extintores) e não podem ficar sob arquibancadas ou camarotes.')
     return {
       destaques: [
         { label: 'Potência necessária', value: n(kva), unit: 'kVA' },
@@ -150,18 +178,16 @@ export const geradores: Calculator = {
       ],
       memoria: [
         `Carga instalada: ${cargas.map((c) => n(c)).join(' + ')} = ${n(kw)} kW.`,
-        `Demanda: ${n(kw)} kW × ${simultaneidade} (simultaneidade) ÷ ${fp} (fator de potência) = ${n(kw * simultaneidade / fp, 1)} kVA.`,
-        `Margem de 25% para partidas e picos → ${n(kva, 1)} kVA → ${unidades} × ${tamanho} kVA${reservaN1 ? ' + 1 reserva (N+1)' : ''}.`,
-        `Diesel: ~0,27 L por kWh entregue × ${n(kw * simultaneidade, 1)} kW × ${duracao} h + 10% de margem = ${n(litros)} L.`,
+        `Demanda: ${n(kw)} kW × ${simultaneidade} (simultaneidade) ÷ ${fp} (fator de potência) × 1,25 (margem para partidas e picos) = ${n(kva, 1)} kVA → ${unidades} × ${tamanho} kVA${reservaN1 ? ' + 1 reserva (N+1)' : ''}.`,
+        `Energia: ${n(kw * simultaneidade, 1)} kW × ${duracao} h = ${n(kwh)} kWh. Diesel: 0,28 L/kWh (faixa típica de 0,25–0,30 a 75% de carga) + 10% de margem = ${n(litros)} L.`,
       ],
-      alertas: [
-        'Não há parâmetro federal de kVA por pessoa: o dimensionamento depende do levantamento real das cargas com os fornecedores de som, luz e vídeo.',
-        'Instalações temporárias devem atender à NR-10 e à NBR 5410, com aterramento e projeto/ART de profissional habilitado.',
-      ],
+      alertas,
       estimativa: true,
     }
   },
 }
+
+// ─── Resíduos ───────────────────────────────────────────────────────────────
 
 export const residuos: Calculator = {
   slug: 'residuos',
@@ -174,21 +200,21 @@ export const residuos: Calculator = {
     duracaoField,
     { key: 'alimentacao', label: 'Oferta de alimentação', type: 'select', default: 'lanches', options: [{ value: 'nenhuma', label: 'Sem alimentação' }, { value: 'lanches', label: 'Lanches e bebidas' }, { value: 'refeicoes', label: 'Refeições completas' }] },
   ],
-  calcular(i) {
+  calcular(i, ctx) {
     const publico = num(i, 'publico')
     const duracao = num(i, 'duracao')
     const alim = str(i, 'alimentacao')
-    const kgPessoa = alim === 'refeicoes' ? 0.6 : alim === 'lanches' ? 0.3 : 0.1
+    const kgPessoa = alim === 'refeicoes' ? 1.1 : alim === 'lanches' ? 0.5 : 0.25
     const fDuracao = Math.max(0.5, Math.min(2, duracao / 6))
     const kg = publico * kgPessoa * fDuracao
-    const litros = kg * 6.5
+    const litros = (kg / 150) * 1000
     const esvaziamentos = Math.max(1, Math.floor(duracao / 2))
     const lixeiras = Math.max(up(litros / (100 * esvaziamentos)), up(publico / 100))
     const alertas = [
-      'Use o código de cores da CONAMA 275/2001 na coleta seletiva (azul papel, vermelho plástico, verde vidro, amarelo metal, marrom orgânico, cinza rejeito).',
-      'O organizador responde pelo gerenciamento dos resíduos (Lei 12.305/2010). Contrate empresa licenciada para coleta e destinação.',
+      'O enquadramento como grande gerador e a exigência de plano de gerenciamento (PGRS) dependem da lei do município (Lei 12.305/2010, art. 20). Contrate coleta e destinação licenciadas.',
+      'Use o código de cores da CONAMA 275/2001 nos coletores (azul papel, vermelho plástico, verde vidro, amarelo metal, marrom orgânico, cinza rejeito).',
     ]
-    if (litros > 120) alertas.push(`Volume acima de 120 L por dia: em muitos municípios o evento é enquadrado como grande gerador e precisa de plano de gerenciamento (PGRS). Confira a lei municipal.`)
+    if (ctx.uf === 'RJ') alertas.push('Na capital do RJ, o organizador declara a responsabilidade pela limpeza e retirada do lixo durante e após o evento (Decreto Rio 55.648/2025).')
     return {
       destaques: [
         { label: 'Resíduos estimados', value: n(kg), unit: 'kg' },
@@ -201,9 +227,10 @@ export const residuos: Calculator = {
         ['Rejeitos (~15%)', `${n(kg * 0.15)} kg`],
       ],
       memoria: [
-        `Geração estimada: ${kgPessoa} kg por pessoa (${alim}), ajustada pela duração (×${n(fDuracao, 2)}) → ${n(kg)} kg.`,
-        `Densidade média de resíduo de evento ~150 kg/m³ → ${n(litros)} L.`,
-        `Lixeiras: volume ÷ (100 L × ${esvaziamentos} esvaziamento(s)), com mínimo de 1 a cada 100 pessoas → ${lixeiras}.`,
+        'Não há parâmetro normativo de resíduo por pessoa em eventos. Referências: 1,04 kg por habitante por dia no Brasil (ABREMA, 2022) e cerca de 1,1 kg por convidado em casamentos com refeição (estudo do IFB).',
+        `Adotado ${n(kgPessoa, 2)} kg por pessoa para ${alim === 'refeicoes' ? 'refeições completas' : alim === 'lanches' ? 'lanches e bebidas' : 'evento sem alimentação'}, ajustado pela duração (×${n(fDuracao, 2)}) → ${n(kg)} kg.`,
+        `Volume com densidade média de 150 kg/m³ → ${n(litros)} L.`,
+        `Lixeiras: volume ÷ (100 L × ${esvaziamentos} esvaziamento(s) a cada 2 h), com mínimo de 1 a cada 100 pessoas → ${lixeiras}.`,
       ],
       alertas,
       estimativa: true,
@@ -211,9 +238,16 @@ export const residuos: Calculator = {
   },
 }
 
+// ─── Ruído ──────────────────────────────────────────────────────────────────
+
+// ABNT NBR 10151:2019, Tabela 3 (RLAeq, dB): [diurno, noturno]
 const LIMITES_RUIDO: Record<string, { diurno: number; noturno: number; label: string }> = {
-  residencial: { diurno: 55, noturno: 50, label: 'Área estritamente residencial' },
-  mista: { diurno: 65, noturno: 55, label: 'Área mista com comércio' },
+  rural: { diurno: 40, noturno: 35, label: 'área rural' },
+  residencial: { diurno: 50, noturno: 45, label: 'área estritamente residencial, hospitais ou escolas' },
+  mista_residencial: { diurno: 55, noturno: 50, label: 'área mista predominantemente residencial' },
+  mista_comercial: { diurno: 60, noturno: 55, label: 'área mista com vocação comercial e administrativa' },
+  mista_recreacional: { diurno: 65, noturno: 55, label: 'área mista com vocação recreacional' },
+  industrial: { diurno: 70, noturno: 60, label: 'área predominantemente industrial' },
 }
 
 export const sonorizacao: Calculator = {
@@ -224,14 +258,14 @@ export const sonorizacao: Calculator = {
   normSlug: 'sonorizacao',
   campos: [
     { key: 'nivel', label: 'Nível sonoro medido a 10 m do PA', type: 'number', default: 100, min: 40, max: 140, unit: 'dB(A)' },
-    { key: 'distancia', label: 'Distância até a residência mais próxima', type: 'number', default: 200, min: 10, max: 10000, unit: 'm' },
-    { key: 'zona', label: 'Tipo de área no entorno', type: 'select', default: 'mista', options: [{ value: 'residencial', label: 'Estritamente residencial' }, { value: 'mista', label: 'Mista, com comércio' }] },
-    { key: 'periodo', label: 'Horário do evento', type: 'select', default: 'noturno', options: [{ value: 'diurno', label: 'Diurno' }, { value: 'noturno', label: 'Noturno (entra após 22 h na maioria das cidades)' }] },
+    { key: 'distancia', label: 'Distância até o imóvel vizinho mais próximo', type: 'number', default: 200, min: 10, max: 10000, unit: 'm' },
+    { key: 'zona', label: 'Tipo de área do vizinho (pela lei de uso do solo)', type: 'select', default: 'mista_residencial', options: Object.entries(LIMITES_RUIDO).map(([value, z]) => ({ value, label: z.label[0].toUpperCase() + z.label.slice(1) })) },
+    { key: 'periodo', label: 'Horário do evento', type: 'select', default: 'noturno', options: [{ value: 'diurno', label: 'Diurno' }, { value: 'noturno', label: 'Noturno' }] },
   ],
   calcular(i) {
     const nivel = num(i, 'nivel')
     const distancia = num(i, 'distancia')
-    const zona = LIMITES_RUIDO[str(i, 'zona')] ?? LIMITES_RUIDO.mista
+    const zona = LIMITES_RUIDO[str(i, 'zona')] ?? LIMITES_RUIDO.mista_residencial
     const periodo = str(i, 'periodo') === 'diurno' ? 'diurno' : 'noturno'
     const limite = zona[periodo]
     const noReceptor = nivel - 20 * Math.log10(distancia / 10)
@@ -240,19 +274,19 @@ export const sonorizacao: Calculator = {
     const nivelMax = limite + 20 * Math.log10(distancia / 10)
     return {
       destaques: [
-        { label: 'Nível estimado na vizinhança', value: n(noReceptor), unit: 'dB(A)' },
+        { label: 'Nível estimado no vizinho', value: n(noReceptor), unit: 'dB(A)' },
         { label: `Limite (${periodo})`, value: n(limite), unit: 'dB(A)' },
         { label: 'Situação', value: conforme ? 'Dentro do limite' : 'Acima do limite' },
         { label: 'Nível máximo a 10 m do PA', value: n(nivelMax), unit: 'dB(A)' },
       ],
       memoria: [
-        `Atenuação pela distância (−6 dB a cada vez que a distância dobra): ${nivel} − 20 × log10(${n(distancia)} ÷ 10) = ${n(noReceptor, 1)} dB(A).`,
-        `Limite NBR 10151 para ${zona.label.toLowerCase()}, período ${periodo}: ${limite} dB(A).`,
-        `Para respeitar o limite, o PA precisaria estar a ${n(distMin)} m da residência ou operar a no máximo ${n(nivelMax, 1)} dB(A) medidos a 10 m.`,
+        `Atenuação em campo livre (−6 dB a cada vez que a distância dobra): ${nivel} − 20 × log10(${n(distancia)} ÷ 10) = ${n(noReceptor, 1)} dB(A).`,
+        `Limite da NBR 10151:2019 (Tabela 3) para ${zona.label}, período ${periodo}: ${limite} dB(A).`,
+        `Para respeitar o limite, o PA precisaria estar a ${n(distMin)} m do vizinho ou operar a no máximo ${n(nivelMax, 1)} dB(A) medidos a 10 m.`,
       ],
       alertas: [
-        'O cálculo considera campo livre: barreiras, vento e reflexões mudam o resultado. A medição oficial é feita no limite do imóvel vizinho, conforme a NBR 10151.',
-        'Municípios podem ter limites mais restritivos e exigir alvará específico para som amplificado.',
+        'O cálculo considera campo livre: vento, barreiras, reflexões e graves (que se propagam mais) mudam o resultado. A medição oficial é no imóvel afetado, conforme a NBR 10151.',
+        'A classificação da área e o horário noturno vêm da lei municipal, que pode ser mais restritiva e exigir licença para som amplificado.',
       ],
       estimativa: true,
     }

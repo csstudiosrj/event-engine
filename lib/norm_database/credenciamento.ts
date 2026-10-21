@@ -1,46 +1,47 @@
 import type { Calculadora } from "./types";
+import { URL } from "./fontes";
 
 export const credenciamento: Calculadora = {
   slug: "credenciamento",
-  titulo: "Credenciamento e Recepção",
-  descricao: "Requisitos de credenciamento, controle de acesso e proteção de dados para eventos",
+  titulo: "Credenciamento e Acesso",
+  descricao: "Controle de acesso, catracas e dados pessoais",
   regras: [
     {
-      id: "lgpd-credenciamento-dados-pessoais",
-      descricao:
-        "O credenciamento de participantes envolve coleta de dados pessoais (nome, CPF, e-mail) e deve cumprir a LGPD: obter consentimento informado, coletar apenas dados necessários, armazená-los com segurança e garantir o direito de acesso, correção e exclusão.",
-      fonte: "Lei 13.709/2018 (LGPD)",
-      tipo_fonte: "lei_federal",
-      dispositivo: "Arts. 7º, 9º e 18",
-      url_oficial:
-        "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm",
+      id: "sp-it12-catracas",
+      descricao: "São Paulo: as catracas devem atender todo o público em no máximo 1 hora, considerando capacidade máxima de 660 pessoas por catraca por hora. Catracas devem ser reversíveis e não contam como saída de emergência.",
+      fonte: "IT 12/2025 – CBPMESP",
+      tipo_fonte: "instrucao_tecnica",
+      dispositivo: "Itens 3.2.1.22 a 3.2.1.24",
+      url_oficial: URL.spIt12,
+      ufs: ["SP"],
       veredito: "confirmado",
     },
     {
-      id: "lei14967-2024-controle-acesso",
-      descricao:
-        "O organizador é responsável pelo controle de acesso ao evento, devendo garantir que apenas pessoas autorizadas ingressem e que o público máximo aprovado não seja ultrapassado.",
-      fonte: "Lei 14.967/2024",
-      tipo_fonte: "lei_federal",
-      url_oficial:
-        "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2024/lei/l14967.htm",
+      id: "rj-nt504-acesso",
+      descricao: "Rio de Janeiro: eventos em local fechado devem ter controle de acesso (catracas reversíveis ou equivalente aprovado) para garantir a lotação. Catracas dimensionadas para todo o público em até 1 hora, a 660 pessoas por catraca por hora, sem contar como largura de saída. Placa informativa de lotação obrigatória.",
+      fonte: "NT 5-04 – CBMERJ",
+      tipo_fonte: "instrucao_tecnica",
+      dispositivo: "Itens 6.1.10 e 6.2.5 a 6.2.7",
+      url_oficial: URL.rjNt504,
+      ufs: ["RJ"],
       veredito: "confirmado",
     },
     {
-      id: "decreto13012-2026-credenciamento",
-      descricao:
-        "O Decreto 13.012/2026 exige que o organizador mantenha registro atualizado do número de pessoas no evento a qualquer momento, para fins de controle de capacidade e segurança.",
+      id: "dec13012-revista",
+      descricao: "Seguranças privados não podem fazer busca pessoal; a revista na entrada de eventos é lícita apenas mediante solicitação e adesão voluntária.",
       fonte: "Decreto 13.012/2026",
       tipo_fonte: "decreto_federal",
-      dispositivo: "Art. 22",
+      dispositivo: "Art. 21, § 2º",
+      url_oficial: URL.dec13012,
       veredito: "confirmado",
     },
     {
-      id: "rdc656-2022-identificacao-participantes",
-      descricao:
-        "Em eventos de massa com serviços de alimentação, os responsáveis pelo credenciamento devem estar identificados e ter acesso a informações sobre alergênicos para atendimento de emergências sanitárias.",
-      fonte: "RDC 656/2022",
-      tipo_fonte: "resolucao_anvisa",
+      id: "lgpd-credenciamento",
+      descricao: "Dados coletados no credenciamento (nome, CPF, e-mail, foto) seguem a LGPD: finalidade informada, coleta do mínimo necessário, guarda segura e atendimento aos direitos do titular.",
+      fonte: "Lei 13.709/2018 (LGPD)",
+      tipo_fonte: "lei_federal",
+      dispositivo: "Arts. 6º e 18",
+      url_oficial: URL.lgpd,
       veredito: "confirmado",
     },
   ],
