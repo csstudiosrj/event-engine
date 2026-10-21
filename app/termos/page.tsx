@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import { LegalPage } from '@/components/legal-page'
+import { pageMetadata } from '@/lib/seo'
 import { COMPANY, CONTACT_EMAIL } from '@/lib/config'
 
-export const metadata = { title: 'Termos de Uso — Normato' }
+export const metadata = pageMetadata({ title: 'Termos de Uso — Normato', description: 'Termos de uso do Normato: o que as calculadoras fazem, créditos, planos, pagamentos, reembolso e responsabilidades.', path: '/termos' })
 
 export default function TermosPage() {
   return <LegalPage title="Termos de Uso" updated="21 de outubro de 2026">

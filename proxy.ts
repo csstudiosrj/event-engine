@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { publicUrl } from '@/lib/config'
 
-const PUBLIC_ROUTES = ['/', '/precos', '/termos', '/privacidade', '/auth/login', '/auth/cadastro', '/auth/callback', '/auth/recuperar', '/auth/signout']
+const PUBLIC_ROUTES = ['/', '/precos', '/termos', '/privacidade', '/auth/login', '/auth/cadastro', '/auth/callback', '/auth/recuperar', '/auth/signout', '/sitemap.xml', '/robots.txt', '/opengraph-image']
 // Rotas que tratam autenticação por conta própria (ex.: webhook do Pagar.me)
 const PUBLIC_PREFIXES = ['/calculadoras', '/api']
 const AUTH_ROUTES = ['/auth/login', '/auth/cadastro']

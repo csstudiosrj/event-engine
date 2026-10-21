@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import { LegalPage } from '@/components/legal-page'
+import { pageMetadata } from '@/lib/seo'
 import { COMPANY, CONTACT_EMAIL } from '@/lib/config'
 
-export const metadata = { title: 'Política de Privacidade — Normato' }
+export const metadata = pageMetadata({ title: 'Política de Privacidade — Normato', description: 'Como o Normato trata dados pessoais conforme a LGPD: dados coletados, finalidades, compartilhamento, prazos e seus direitos.', path: '/privacidade' })
 
 export default function PrivacidadePage() {
   return <LegalPage title="Política de Privacidade" updated="21 de outubro de 2026">

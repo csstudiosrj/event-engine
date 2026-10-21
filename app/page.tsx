@@ -1,9 +1,14 @@
-"use client"
 import Link from "next/link"
-import { useState } from "react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { CATALOG } from "@/lib/calculators/catalog"
+import { CANONICAL_URL, pageMetadata } from "@/lib/seo"
+
+export const metadata = pageMetadata({
+  title: "Normato — Calculadoras para dimensionar eventos: brigada, saídas de emergência, sanitários",
+  description: "Calcule brigada de incêndio, saídas de emergência, sanitários, equipe médica, acessibilidade e mais para o seu evento, com as normas do Corpo de Bombeiros de SP e RJ e a legislação federal. 1 cálculo grátis.",
+  path: "/",
+})
 
 const faq = [
   {
@@ -29,12 +34,19 @@ const faq = [
 ]
 
 export default function Home() {
-  const [open, setOpen] = useState<number | null>(null)
 
   return (
     <div style={{ fontFamily: "system-ui, -apple-system, sans-serif", background: "#F7F8FA", color: "#0F1B33", minHeight: "100vh" }}>
 
       <Header />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        "@context": "https://schema.org",
+        "@graph": [
+          { "@type": "WebSite", name: "Normato", url: CANONICAL_URL, inLanguage: "pt-BR" },
+          { "@type": "Organization", name: "Normato", url: CANONICAL_URL, parentOrganization: { "@type": "Organization", name: "ARXUM group", url: "https://www.arxum.com.br" } },
+          { "@type": "FAQPage", mainEntity: faq.map(({ q, a }) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })) },
+        ],
+      }) }} />
 
       {/* Hero */}
       <section style={{ maxWidth: 1100, margin: "0 auto", padding: "72px 24px 56px" }}>
@@ -126,21 +138,11 @@ export default function Home() {
       <section id="faq" style={{ maxWidth: 720, margin: "0 auto", padding: "80px 24px" }}>
         <h2 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 32px", letterSpacing: "-0.3px" }}>Perguntas frequentes</h2>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {faq.map(({ q, a }, i) => (
-            <div key={i} style={{ border: "1px solid #E2E8F0", borderRadius: 10, overflow: "hidden", background: "#fff" }}>
-              <button
-                onClick={() => setOpen(open === i ? null : i)}
-                style={{ width: "100%", textAlign: "left", padding: "16px 20px", background: "none", border: "none", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 15, fontWeight: 600, color: "#0F1B33" }}
-              >
-                {q}
-                <span style={{ fontSize: 18, color: "#7A96B0", marginLeft: 12, flexShrink: 0 }}>{open === i ? "−" : "+"}</span>
-              </button>
-              {open === i && (
-                <div style={{ padding: "0 20px 16px", fontSize: 14, color: "#4A6580", lineHeight: 1.7, borderTop: "1px solid #F1F5F9" }}>
-                  {a}
-                </div>
-              )}
-            </div>
+          {faq.map(({ q, a }) => (
+            <details key={q} style={{ border: "1px solid #E2E8F0", borderRadius: 10, overflow: "hidden", background: "#fff" }}>
+              <summary style={{ padding: "16px 20px", cursor: "pointer", fontSize: 15, fontWeight: 600, color: "#0F1B33" }}>{q}</summary>
+              <div style={{ padding: "0 20px 16px", fontSize: 14, color: "#4A6580", lineHeight: 1.7, borderTop: "1px solid #F1F5F9" }}>{a}</div>
+            </details>
           ))}
         </div>
       </section>

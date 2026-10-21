@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 import { AppShell } from "@/components/app-shell"
 import { ToastProvider } from "@/components/ui/toast"
-import { SITE_URL } from "@/lib/config"
+import { CANONICAL_URL } from "@/lib/seo"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,17 +31,13 @@ export const metadata: Metadata = {
     "alvará evento",
     "memorial descritivo evento",
   ],
-  authors: [{ name: "Normato", url: SITE_URL }],
+  authors: [{ name: "Normato", url: CANONICAL_URL }],
   creator: "Normato — ARXUM group",
-  metadataBase: new URL(SITE_URL + "/"),
-  alternates: {
-    canonical: SITE_URL,
-  },
+  metadataBase: new URL(CANONICAL_URL + "/"),
   openGraph: {
     title: "Normato — Calcule seu evento",
     description:
       "A auditoria técnica do seu evento. Cálculos de brigada, equipe médica, sanitários e saídas de emergência em segundos.",
-    url: SITE_URL,
     siteName: "Normato",
     locale: "pt_BR",
     type: "website",

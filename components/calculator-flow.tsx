@@ -91,17 +91,12 @@ export function CalculatorFlow({ def }: { def: CalculatorDef }) {
 
   const loginHref = `/auth/login?redirectTo=${encodeURIComponent(`/calculadoras/${def.slug}${eventId ? `?evento=${eventId}` : ''}`)}`
 
-  return <div className="mx-auto max-w-7xl px-4 pb-28 pt-6 lg:px-8 lg:pb-12 lg:pt-8">
+  return <div className="mx-auto max-w-7xl px-4 pb-28 pt-2 lg:px-8 lg:pb-12">
     <div className="mb-6 flex flex-wrap items-center justify-between gap-3 print:hidden">
       <Link href={eventId ? `/painel?evento=${eventId}` : '/#calculadoras'} className="flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-[#0F1B33]"><ArrowLeft className="size-4" /> {eventId ? 'Voltar ao evento' : 'Catálogo'}</Link>
       {def.categoria === 'estrategica'
         ? <Badge className="bg-[#0F1B33] text-white hover:bg-[#0F1B33]"><LockKeyhole data-icon="inline-start" /> Planos Solo e Pro</Badge>
         : <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100"><Sparkles data-icon="inline-start" /> {CALC_COST} crédito por cálculo</Badge>}
-    </div>
-    <div className="mb-6">
-      <p className="text-sm font-medium text-amber-600">Calculadora</p>
-      <h1 className="text-3xl font-bold tracking-tight">{def.titulo}</h1>
-      <p className="mt-1 text-slate-600">{def.sub}</p>
     </div>
     {!bloqueado && <div className="mb-8 print:hidden"><FlowStepper currentStep={step} /></div>}
 
