@@ -71,14 +71,21 @@ export async function createPaymentLink(productId: ProductId, paymentId: string,
           pix_settings: { expires_in: 60 * 60 },
           credit_card_settings: { operation_type: 'auth_and_capture', installments: [{ number: 1, total: product.amountCents }] },
         },
-    customer_settings: {
-      customer: {
-        name: (customer.name || customer.email.split('@')[0]).slice(0, 64),
-        email: customer.email.slice(0, 64),
-        type: 'individual',
-        code: customer.userId,
-      },
-    },
+    // Pix exige CPF/CNPJ e telefone do comprador. Na compra avulsa não enviamos
+    // o cliente, e o checkout do Pagar.me pede todos os dados. Na assinatura o
+    // `code` liga a recorrência ao usuário do Normato nas renovações.
+    ...(isSubscription
+      ? {
+          customer_settings: {
+            customer: {
+              name: (customer.name || customer.email.split('@')[0]).slice(0, 64),
+              email: customer.email.slice(0, 64),
+              type: 'individual',
+              code: customer.userId,
+            },
+          },
+        }
+      : {}),
     cart_settings: isSubscription
       ? { recurrences: [{ plan_id: planId }] }
       : { items: [{ name: product.name, amount: product.amountCents, default_quantity: 1 }] },
