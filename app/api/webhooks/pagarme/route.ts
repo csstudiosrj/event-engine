@@ -5,7 +5,7 @@ import { findStrings, pagarme, productForPlanId } from '@/lib/pagarme'
 import { PLAN_GRACE_DAYS, PRODUCTS, type ProductId } from '@/lib/plans'
 
 // Webhook do Pagar.me. Configurar no painel (Configurações → Webhooks) com a URL
-//   https://arxum.com.br/normato/api/webhooks/pagarme?token=<PAGARME_WEBHOOK_TOKEN>
+//   https://www.arxum.com.br/normato/api/webhooks/pagarme?token=<PAGARME_WEBHOOK_TOKEN>
 // e os eventos order.paid e invoice.paid.
 //
 // O corpo recebido só serve para saber o que mudou: os dados são sempre

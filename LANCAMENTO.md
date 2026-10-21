@@ -32,7 +32,7 @@ Depois, em **Authentication → URL Configuration**:
    ```
 
 4. Em **Configurações → Webhooks → Criar webhook**:
-   - **URL:** `https://arxum.com.br/normato/api/webhooks/pagarme?token=SENHA_DO_PASSO_3`
+   - **URL:** `https://www.arxum.com.br/normato/api/webhooks/pagarme?token=SENHA_DO_PASSO_3`
    - **Eventos:** `order.paid` e `invoice.paid`
 
 ## 3. Variáveis de ambiente (Vercel)
