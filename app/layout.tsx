@@ -1,65 +1,80 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import './globals.css'
-import { AppShell } from '@/components/app-shell'
-import { ToastProvider } from '@/components/ui/toast'
+import type { Metadata } from "next"
+import { Geist, Geist_Mono } from "next/font/google"
+import "./globals.css"
 
-const inter = Inter({ subsets: ['latin'] })
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+})
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+})
 
 export const metadata: Metadata = {
-  title: {
-    default: 'Event Engine — Calculadoras técnicas para eventos',
-    template: '%s | Event Engine',
-  },
+  title: "Normato — Calcule seu evento",
   description:
-    'Dimensione brigada, sanitários, equipe médica, saídas de emergência e mais 15 calculadoras para o seu evento. Normas por estado, memorial descritivo automático. Primeiro cálculo grátis.',
+    "Dimensione brigada de incêndio, equipe médica, sanitários, saídas de emergência e muito mais. Cálculos técnicos baseados nas normas estaduais para eventos no Brasil.",
   keywords: [
-    'calculadora para eventos',
-    'dimensionamento de eventos',
-    'brigada de incêndio evento',
-    'sanitários para eventos',
-    'alvará de evento',
-    'corpo de bombeiros evento',
-    'memorial descritivo evento',
-    'normas para eventos',
-    'planejamento de eventos',
-    'licenciamento de eventos',
+    "dimensionamento evento",
+    "brigada de incêndio evento",
+    "equipe médica evento",
+    "sanitários evento norma",
+    "saída de emergência evento",
+    "CBMERJ NT 5-04",
+    "IT 12 CBPMESP",
+    "calculadora técnica evento",
+    "alvará evento",
+    "memorial descritivo evento",
   ],
-  authors: [{ name: 'ARXUM group', url: 'https://arxum.com.br' }],
-  creator: 'ARXUM group',
+  authors: [{ name: "Normato", url: "https://normato.com.br" }],
+  creator: "Normato — ARXUM group",
+  metadataBase: new URL("https://normato.com.br"),
+  alternates: {
+    canonical: "https://normato.com.br",
+  },
   openGraph: {
-    type: 'website',
-    locale: 'pt_BR',
-    url: 'https://eventengine.csstudios.site',
-    siteName: 'Event Engine',
-    title: 'Event Engine — Calculadoras técnicas para eventos',
+    title: "Normato — Calcule seu evento",
     description:
-      'Dimensione brigada, sanitários, equipe médica e mais 15 calculadoras. Normas por estado, memorial descritivo automático. Primeiro cálculo grátis.',
+      "A auditoria técnica do seu evento. Cálculos de brigada, equipe médica, sanitários e saídas de emergência em segundos.",
+    url: "https://normato.com.br",
+    siteName: "Normato",
+    locale: "pt_BR",
+    type: "website",
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'Event Engine — Calculadoras técnicas para eventos',
+    card: "summary_large_image",
+    title: "Normato — Calcule seu evento",
     description:
-      'Dimensione brigada, sanitários, equipe médica e mais 15 calculadoras. Normas por estado, memorial descritivo automático.',
+      "A auditoria técnica do seu evento. Cálculos técnicos baseados nas normas estaduais em segundos.",
   },
   robots: {
     index: true,
     follow: true,
-    googleBot: { index: true, follow: true },
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
-  alternates: {
-    canonical: 'https://eventengine.csstudios.site',
+  icons: {
+    icon: "/favicon.svg",
+    apple: "/apple-touch-icon.png",
   },
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
   return (
     <html lang="pt-BR">
-      <body className={inter.className}>
-        <AppShell>
-          {children}
-          <ToastProvider />
-        </AppShell>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        {children}
       </body>
     </html>
   )

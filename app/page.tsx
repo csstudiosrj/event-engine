@@ -1,421 +1,360 @@
-'use client'
+"use client"
 
-import {
-  ArrowRight,
-  Bath,
-  CheckCircle2,
-  ChevronRight,
-  Flame,
-  KeyRound,
-  LockKeyhole,
-  MessageSquare,
-  Shield,
-  ShieldCheck,
-  Sparkles,
-  Timer,
-  Users,
-  Zap,
-} from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Footer } from '@/components/footer'
+import Link from "next/link"
+import { useState } from "react"
 
-function Logo() {
+/* ─── Brand symbol ────────────────────────────────────────────────── */
+function NormatoSymbol({ size = 40 }: { size?: number }) {
   return (
-    <a href="/" className="flex items-center gap-2" aria-label="Event Engine">
-      <svg viewBox="0 0 200 200" className="size-9" aria-hidden="true">
-        <rect x="20" y="20" width="160" height="160" rx="38" fill="#0F1B33" />
-        <rect x="55" y="52" width="22" height="96" rx="11" fill="#FFFFFF" />
-        <rect x="55" y="52" width="92" height="22" rx="11" fill="#FFFFFF" />
-        <rect x="55" y="89" width="60" height="22" rx="11" fill="#FFFFFF" />
-        <rect x="55" y="126" width="92" height="22" rx="11" fill="#FFFFFF" />
-        <circle cx="140" cy="100" r="12" fill="#F59E0B" />
-      </svg>
-      <span className="text-lg font-bold tracking-tight text-[#0F1B33]">
-        event <span className="text-[#F59E0B]">engine</span>
-      </span>
-    </a>
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 40 40"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="Normato"
+    >
+      <rect width="40" height="40" rx="8" fill="#0B1F3A" />
+      <rect x="7" y="7" width="6" height="26" rx="1.5" fill="#FFFFFF" />
+      <rect x="27" y="7" width="6" height="26" rx="1.5" fill="#FFFFFF" />
+      <line x1="13" y1="7" x2="27" y2="33" stroke="#E8A020" strokeWidth="6" strokeLinecap="round" />
+    </svg>
   )
 }
 
+function NormatoSymbolLight({ size = 40 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 40 40"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="Normato"
+    >
+      <rect width="40" height="40" rx="8" fill="#FFFFFF" fillOpacity="0.1" />
+      <rect x="7" y="7" width="6" height="26" rx="1.5" fill="#FFFFFF" />
+      <rect x="27" y="7" width="6" height="26" rx="1.5" fill="#FFFFFF" />
+      <line x1="13" y1="7" x2="27" y2="33" stroke="#E8A020" strokeWidth="6" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+/* ─── Calculadoras ────────────────────────────────────────────────── */
 const calculadoras = [
-  { icon: Users,      name: 'Lotação e capacidade',   desc: 'Público máximo por m² conforme o estado' },
-  { icon: Bath,       name: 'Sanitários',              desc: 'Cabines por público, gênero e duração' },
-  { icon: Flame,      name: 'Brigada de incêndio',     desc: 'Brigadistas por área conforme NT/CBM' },
-  { icon: KeyRound,   name: 'Saídas de emergência',    desc: 'Largura e tempo de escoamento' },
-  { icon: Shield,     name: 'Equipe médica',           desc: 'Ambulâncias e postos por faixa de risco' },
-  { icon: LockKeyhole,name: 'Segurança patrimonial',   desc: 'Vigilantes conforme Port. DPF 18045/23' },
+  { slug: "publico",         label: "Dimensionamento de público",      desc: "Capacidade máxima por m² e tipo de ambiente" },
+  { slug: "brigada",         label: "Brigada de incêndio",             desc: "Composição mínima por área e nível de risco" },
+  { slug: "saude",           label: "Equipe médica",                   desc: "Ambulâncias, médicos e enfermeiros exigidos" },
+  { slug: "sanitarios",      label: "Sanitários",                      desc: "Quantidade de vasos, mictórios e lavatórios" },
+  { slug: "saidas",          label: "Saídas de emergência",            desc: "Largura e número de saídas por fluxo de evacuação" },
+  { slug: "extintores",      label: "Extintores",                      desc: "Quantidade e cobertura conforme NT estadual" },
+  { slug: "evacuacao",       label: "Tempo de evacuação",              desc: "Simulação do esvaziamento em minutos" },
+  { slug: "risco",           label: "Mapa de risco",                   desc: "Classificação por perfil de evento e público" },
+  { slug: "estacionamento",  label: "Vagas de estacionamento",         desc: "Número mínimo de vagas por tipo de evento" },
 ]
 
-const dores = [
-  {
-    icon: Timer,
-    titulo: 'Horas de pesquisa para cada evento',
-    texto: 'Produtores gastam em média 4 horas pesquisando normas do Corpo de Bombeiros, Vigilância Sanitária e DPF — para cada evento. O Event Engine entrega isso em minutos.',
-  },
-  {
-    icon: MessageSquare,
-    titulo: 'Insegurança na hora do alvará',
-    texto: 'Sem saber se o dimensionamento está correto, o produtor fica refém do órgão. Com o Event Engine, você chega na vistoria com o memorial descritivo já fundamentado na norma certa.',
-  },
-  {
-    icon: Zap,
-    titulo: 'Consultoria cara para cada evento',
-    texto: 'Contratar um engenheiro de segurança para dimensionar um evento de 500 pessoas custa de R$ 800 a R$ 3.000. O Event Engine faz isso por R$ 4,90.',
-  },
-]
-
-const planos = [
-  {
-    nome: 'Créditos',
-    preco: 'R$ 4,90',
-    periodo: '5 créditos',
-    descricao: 'Para quem organiza eventos esporadicamente e não quer assinatura.',
-    items: ['Qualquer calculadora essencial', 'Resultado com fundamentação legal', 'Sem mensalidade'],
-    cta: 'Comprar créditos',
-    href: '/auth/cadastro',
-    destaque: false,
-  },
-  {
-    nome: 'Solo',
-    preco: 'R$ 29,90',
-    periodo: 'por mês',
-    descricao: 'Para o produtor que tem pelo menos um evento ativo por vez.',
-    items: ['1 evento ativo', 'Todas as calculadoras', 'Memorial descritivo em PDF', 'Fundamentação legal completa'],
-    cta: 'Começar grátis',
-    href: '/auth/cadastro',
-    destaque: true,
-  },
-  {
-    nome: 'Pro',
-    preco: 'R$ 49,90',
-    periodo: 'por mês',
-    descricao: 'Para produtoras com múltiplos eventos simultâneos.',
-    items: ['Eventos ilimitados', 'Comparação de cenários', 'Histórico completo', 'Exportar dossiê PDF'],
-    cta: 'Assinar Pro',
-    href: '/auth/cadastro',
-    destaque: false,
-  },
-]
-
+/* ─── FAQ ─────────────────────────────────────────────────────────── */
 const faq = [
   {
-    q: 'O resultado do Event Engine substitui um engenheiro ou consultor?',
-    a: 'Não — e somos transparentes sobre isso. O Event Engine é uma ferramenta de planejamento que aplica as normas técnicas vigentes para gerar estimativas confiáveis. Para eventos que exigem ART ou projeto aprovado, um profissional habilitado continua sendo necessário. O que muda é que você chega a ele (e ao órgão) com o trabalho inicial já feito.',
+    q: "Para quais estados o Normato calcula?",
+    a: "Atualmente cobrimos Rio de Janeiro (CBMERJ NT 5-04), São Paulo (CBPMESP IT 12) e um modo federal para os demais estados. A base normativa é atualizada conforme novas instruções técnicas são publicadas.",
   },
   {
-    q: 'As normas variam por estado. Como o sistema lida com isso?',
-    a: 'O Event Engine é jurisdição-aware: você informa o estado e o sistema aplica a norma correta (CBMERJ para RJ, CBPMESP para SP, etc.). Quando não há norma estadual mapeada, usa a NBR Federal como fallback — e exibe um selo de alerta para que você confirme com o órgão local.',
+    q: "Os resultados têm validade legal?",
+    a: "O Normato gera a memória de cálculo embasada nas normas vigentes, que serve como base para elaboração do memorial descritivo. A responsabilidade técnica pela assinatura do documento é sempre do profissional habilitado (engenheiro ou arquiteto).",
   },
   {
-    q: 'O que é o Memorial Descritivo e por que preciso dele?',
-    a: 'É o documento técnico com todos os dimensionamentos do evento, fundamentado nas normas legais. Muitos municípios e o próprio Corpo de Bombeiros exigem esse documento para emitir o alvará. O Event Engine gera automaticamente nos planos Solo e Pro.',
+    q: "Como funciona o sistema de créditos?",
+    a: "Cada cálculo consome um crédito. No plano gratuito você recebe créditos mensais para testar a plataforma. Os planos pagos oferecem pacotes maiores e acesso às calculadoras avançadas.",
   },
   {
-    q: 'Posso usar sem assinar?',
-    a: 'Sim. Seu primeiro cálculo é gratuito. Depois disso, você pode comprar pacotes de 5 créditos por R$ 4,90 sem precisar de assinatura.',
+    q: "Posso usar o Normato para eventos em espaços abertos?",
+    a: "Sim. O sistema diferencia ambientes fechados cobertos, fechados descobertos, arenas e áreas gramadas, aplicando as densidades e fluxos de evacuação corretos para cada tipo.",
+  },
+  {
+    q: "O que é o Memorial Descritivo gerado pelo sistema?",
+    a: "É um documento técnico estruturado com todos os dados do evento, os parâmetros normativos aplicados e os resultados dos dimensionamentos. Disponível nos planos PRO e NEURO para entrega direta ao corpo de bombeiros ou prefeitura.",
+  },
+  {
+    q: "O sistema considera open bar, shows pirotécnicos e cozinha industrial?",
+    a: "Sim. Esses fatores elevam o índice de risco e ajustam automaticamente o dimensionamento de brigada, equipe médica e extintores conforme as normas estaduais.",
+  },
+  {
+    q: "Em quanto tempo tenho os resultados?",
+    a: "Todos os cálculos são gerados em segundos após o cadastro do evento. Não é necessário aguardar análise humana.",
+  },
+  {
+    q: "Posso cadastrar vários eventos diferentes?",
+    a: "Sim. Cada evento é uma instância independente com seus próprios parâmetros. Você pode criar, comparar e arquivar quantos eventos precisar dentro do limite do seu plano.",
   },
 ]
 
-export default function HomePage() {
-  return (
-    <div className="min-h-screen bg-white text-[#0F1B33]">
+/* ─── Page ────────────────────────────────────────────────────────── */
+export default function Home() {
+  const [openFaq, setOpenFaq] = useState<number | null>(null)
 
-      {/* ── NAV ─────────────────────────────────────────── */}
-      <nav className="sticky top-0 z-20 border-b border-slate-100 bg-white/95 backdrop-blur-sm">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 lg:px-8">
-          <Logo />
-          <div className="flex items-center gap-2">
-            <a href="/precos" className="hidden text-sm font-medium text-slate-600 hover:text-[#0F1B33] sm:block">
-              Preços
-            </a>
-            <a href="/auth/login">
-              <Button variant="ghost" size="sm">Entrar</Button>
-            </a>
-            <a href="/auth/cadastro">
-              <Button size="sm" className="bg-[#0F1B33] hover:bg-[#1b2b4c]">
-                Começar grátis <ArrowRight className="ml-1.5 size-3.5" />
-              </Button>
-            </a>
+  return (
+    <div className="min-h-screen bg-[#0B1F3A] text-white">
+
+      {/* ── Navbar ─────────────────────────────────────────────────── */}
+      <nav className="sticky top-0 z-50 border-b border-[#1a2f4a] bg-[#0B1F3A]/95 backdrop-blur-sm">
+        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <NormatoSymbol size={32} />
+            <span className="font-semibold text-lg tracking-wide">Normato</span>
+            <span className="hidden md:inline text-xs text-[#8ba4bc] border border-[#1a2f4a] px-2 py-0.5 rounded-full ml-1">
+              Calcule seu evento
+            </span>
+          </div>
+          <div className="hidden md:flex items-center gap-8 text-sm text-[#8ba4bc]">
+            <a href="#como-funciona" className="hover:text-white transition-colors">Como funciona</a>
+            <a href="#calculadoras" className="hover:text-white transition-colors">Calculadoras</a>
+            <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
+          </div>
+          <div className="flex items-center gap-3">
+            <Link href="/auth/login" className="text-sm text-[#8ba4bc] hover:text-white transition-colors">
+              Entrar
+            </Link>
+            <Link
+              href="/auth/cadastro"
+              className="text-sm font-medium bg-[#E8A020] text-[#0B1F3A] px-4 py-2 rounded-lg hover:bg-[#d4911c] transition-colors"
+            >
+              Começar grátis
+            </Link>
           </div>
         </div>
       </nav>
 
-      {/* ── HERO ────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-[#0F1B33] px-4 py-20 text-white lg:py-28">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_#F59E0B22,_transparent_60%)]" />
-        <div className="relative mx-auto max-w-4xl text-center">
-          <Badge className="mb-6 gap-1.5 border-amber-400/30 bg-amber-400/10 text-amber-400 hover:bg-amber-400/10">
-            <Sparkles className="size-3" /> Primeiro cálculo grátis
-          </Badge>
-          <h1 className="text-4xl font-bold leading-tight tracking-tight lg:text-6xl">
-            Tudo que o Corpo de Bombeiros vai exigir do seu evento —{' '}
-            <span className="text-[#F59E0B]">em minutos</span>
-          </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-300 lg:text-xl">
-            O Event Engine aplica as normas técnicas vigentes — por estado — e entrega o dimensionamento
-            correto de brigada, sanitários, equipe médica, saídas de emergência e mais 15 calculadoras.
-            Sem pesquisa. Sem dúvida. Sem susto na vistoria.
+      {/* ── Hero ───────────────────────────────────────────────────── */}
+      <section className="max-w-6xl mx-auto px-6 pt-24 pb-20 text-center">
+        <div className="inline-flex items-center gap-2 text-xs font-medium text-[#E8A020] bg-[#E8A020]/10 border border-[#E8A020]/20 px-3 py-1.5 rounded-full mb-8">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M6 1l1.5 3H11l-2.75 2 1 3L6 7.5 2.75 9l1-3L1 4h3.5z" fill="#E8A020" />
+          </svg>
+          Baseado nas normas estaduais vigentes
+        </div>
+
+        <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.05] mb-6">
+          A auditoria técnica{" "}
+          <span className="text-[#E8A020]">do seu evento.</span>
+        </h1>
+
+        <p className="text-xl text-[#8ba4bc] max-w-2xl mx-auto mb-10 leading-relaxed">
+          Dimensione brigada de incêndio, equipe médica, sanitários e saídas de emergência
+          em segundos. Resultados baseados nas instruções técnicas do CBMERJ, CBPMESP
+          e normas federais.
+        </p>
+
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Link
+            href="/auth/cadastro"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#E8A020] text-[#0B1F3A] font-semibold px-8 py-4 rounded-xl text-base hover:bg-[#d4911c] transition-colors"
+          >
+            Calcular agora — é grátis
+          </Link>
+          <a
+            href="#como-funciona"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 text-[#8ba4bc] border border-[#1a2f4a] px-8 py-4 rounded-xl text-base hover:text-white hover:border-[#2a4060] transition-colors"
+          >
+            Ver como funciona
+          </a>
+        </div>
+      </section>
+
+      {/* ── Credibility bar ────────────────────────────────────────── */}
+      <section className="border-y border-[#1a2f4a] bg-[#0d2440]">
+        <div className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          {[
+            { n: "16",    label: "calculadoras técnicas" },
+            { n: "3",     label: "estados cobertos" },
+            { n: "< 5s",  label: "para gerar o laudo" },
+            { n: "100%",  label: "baseado em normas vigentes" },
+          ].map(({ n, label }) => (
+            <div key={label}>
+              <p className="text-3xl font-bold text-[#E8A020]">{n}</p>
+              <p className="text-sm text-[#8ba4bc] mt-1">{label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Como funciona ──────────────────────────────────────────── */}
+      <section id="como-funciona" className="max-w-6xl mx-auto px-6 py-24">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+          Como funciona
+        </h2>
+        <p className="text-[#8ba4bc] text-center mb-16 max-w-xl mx-auto">
+          Do cadastro ao resultado técnico em três passos.
+        </p>
+
+        <div className="grid md:grid-cols-3 gap-8">
+          {[
+            {
+              step: "01",
+              title: "Cadastre o evento",
+              desc: "Informe estado, município, data, público estimado, área em m², tipo de ambiente e características específicas como open bar, shows pirotécnicos e cozinha industrial.",
+            },
+            {
+              step: "02",
+              title: "O motor executa os cálculos",
+              desc: "O Normato aplica os parâmetros das normas estaduais vigentes — NT 5-04, IT 12, Portaria 88/2024 e outras — e gera todos os dimensionamentos em segundos.",
+            },
+            {
+              step: "03",
+              title: "Receba o resultado técnico",
+              desc: "Acesse os números exigidos por calculadora, com as referências normativas de cada item. Nos planos avançados, exporte o Memorial Descritivo completo.",
+            },
+          ].map(({ step, title, desc }) => (
+            <div key={step} className="bg-[#0d2440] border border-[#1a2f4a] rounded-2xl p-8">
+              <span className="text-[#E8A020] font-mono text-sm font-medium">{step}</span>
+              <h3 className="text-lg font-semibold mt-3 mb-3">{title}</h3>
+              <p className="text-[#8ba4bc] text-sm leading-relaxed">{desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Calculadoras ───────────────────────────────────────────── */}
+      <section id="calculadoras" className="bg-[#0d2440] border-y border-[#1a2f4a]">
+        <div className="max-w-6xl mx-auto px-6 py-24">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+            Calculadoras disponíveis
+          </h2>
+          <p className="text-[#8ba4bc] text-center mb-16 max-w-xl mx-auto">
+            Cada calculadora aplica a norma correta para o estado do evento.
           </p>
-          <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            <a href="/auth/cadastro">
-              <Button size="lg" className="w-full bg-[#F59E0B] text-[#0F1B33] hover:bg-amber-400 sm:w-auto">
-                Calcular meu evento agora <ArrowRight className="ml-2 size-4" />
-              </Button>
-            </a>
-            <a href="/precos">
-              <Button size="lg" variant="ghost" className="w-full border border-white/20 text-white hover:bg-white/10 sm:w-auto">
-                Ver planos e preços
-              </Button>
-            </a>
-          </div>
-          <p className="mt-5 text-sm text-slate-400">
-            Sem cartão de crédito. Primeiro cálculo gratuito.
-          </p>
-        </div>
-      </section>
 
-      {/* ── DORES ───────────────────────────────────────── */}
-      <section className="bg-slate-50 px-4 py-16 lg:py-20">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-12 text-center">
-            <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-amber-600">O problema</p>
-            <h2 className="text-3xl font-bold tracking-tight lg:text-4xl">
-              Produzir eventos no Brasil é burocrático por natureza
-            </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-slate-600">
-              Normas que mudam por estado, órgãos diferentes pedindo documentos diferentes, e nenhuma
-              ferramenta que centralize tudo isso. Até agora.
-            </p>
-          </div>
-          <div className="grid gap-6 lg:grid-cols-3">
-            {dores.map(({ icon: Icon, titulo, texto }) => (
-              <Card key={titulo} className="border-slate-200 bg-white">
-                <CardContent className="p-6">
-                  <div className="mb-4 flex size-11 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
-                    <Icon className="size-5" />
-                  </div>
-                  <h3 className="mb-2 font-bold">{titulo}</h3>
-                  <p className="text-sm leading-relaxed text-slate-600">{texto}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── COMO FUNCIONA ───────────────────────────────── */}
-      <section className="px-4 py-16 lg:py-20">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-12 text-center">
-            <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-amber-600">Como funciona</p>
-            <h2 className="text-3xl font-bold tracking-tight lg:text-4xl">Três passos. Um evento seguro.</h2>
-          </div>
-          <div className="grid gap-8 lg:grid-cols-3">
-            {[
-              { n: '01', titulo: 'Cadastre seu evento', texto: 'Informe nome, data, cidade, público esperado e características do espaço. Esses dados alimentam todas as calculadoras de uma vez.' },
-              { n: '02', titulo: 'Escolha a calculadora', texto: 'Selecione o que precisa dimensionar — brigada, sanitários, equipe médica, saídas, segurança. O sistema aplica a norma do seu estado automaticamente.' },
-              { n: '03', titulo: 'Use o resultado', texto: 'Receba o dimensionamento fundamentado na lei. Salve, compartilhe ou baixe o Memorial Descritivo em PDF para apresentar ao órgão.' },
-            ].map(({ n, titulo, texto }) => (
-              <div key={n} className="flex gap-5">
-                <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-[#0F1B33] text-lg font-bold text-[#F59E0B]">
-                  {n}
-                </div>
-                <div>
-                  <h3 className="mb-2 font-bold">{titulo}</h3>
-                  <p className="text-sm leading-relaxed text-slate-600">{texto}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── CALCULADORAS ────────────────────────────────── */}
-      <section className="bg-slate-50 px-4 py-16 lg:py-20">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-12 text-center">
-            <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-amber-600">O que calculamos</p>
-            <h2 className="text-3xl font-bold tracking-tight lg:text-4xl">
-              20 calculadoras. Uma plataforma.
-            </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-slate-600">
-              Cada calculadora aplica a norma correta para o seu estado — do CBMERJ ao CBPMESP,
-              da Portaria federal às regras municipais.
-            </p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {calculadoras.map(({ icon: Icon, name, desc }) => (
-              <div key={name} className="flex items-start gap-4 rounded-xl border border-slate-200 bg-white p-4">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#0F1B33] text-white">
-                  <Icon className="size-5" />
-                </div>
-                <div>
-                  <p className="font-semibold">{name}</p>
-                  <p className="mt-0.5 text-sm text-slate-500">{desc}</p>
-                </div>
-              </div>
-            ))}
-            <div className="flex items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white p-4">
-              <p className="text-sm font-medium text-slate-500">
-                + 14 calculadoras disponíveis
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── DIFERENCIAIS ────────────────────────────────── */}
-      <section className="px-4 py-16 lg:py-20">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
-            <div>
-              <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-amber-600">Por que o Event Engine</p>
-              <h2 className="text-3xl font-bold tracking-tight lg:text-4xl">
-                Base legal auditada. Resultado que você pode apresentar.
-              </h2>
-              <p className="mt-4 text-slate-600">
-                Cada parâmetro de cálculo tem rastreabilidade até a fonte oficial —
-                número da norma, artigo, data de vigência. Você não recebe um número solto:
-                recebe o número e a lei que o sustenta.
-              </p>
-              <ul className="mt-8 flex flex-col gap-4">
-                {[
-                  'Normas por estado: RJ, SP, PE e fallback federal',
-                  'Memorial Descritivo gerado automaticamente',
-                  'Alertas de recálculo quando o público muda',
-                  'Checklist de licenciamento por etapa',
-                  'Resultado compartilhável via link ou PDF',
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-3">
-                    <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-emerald-600" />
-                    <span className="text-sm text-slate-700">{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <a href="/auth/cadastro" className="mt-8 inline-block">
-                <Button className="bg-[#0F1B33] hover:bg-[#1b2b4c]">
-                  Começar agora <ArrowRight className="ml-2 size-4" />
-                </Button>
-              </a>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {[
-                { icon: ShieldCheck, titulo: 'Base legal verificada', texto: 'Normas auditadas por IA especializada antes de entrar no sistema.' },
-                { icon: Timer,       titulo: 'Minutos, não horas',    texto: 'O que levava horas de pesquisa agora leva menos de 5 minutos.' },
-                { icon: Zap,         titulo: 'Sempre atualizado',     texto: 'Quando uma norma muda, o sistema atualiza — não a sua planilha.' },
-                { icon: Users,       titulo: 'Para todo produtor',    texto: 'Do evento de 200 pessoas ao festival de 50 mil. A mesma ferramenta.' },
-              ].map(({ icon: Icon, titulo, texto }) => (
-                <Card key={titulo} className="border-slate-200">
-                  <CardContent className="p-5">
-                    <div className="mb-3 flex size-10 items-center justify-center rounded-lg bg-amber-100 text-amber-700">
-                      <Icon className="size-5" />
-                    </div>
-                    <p className="font-semibold">{titulo}</p>
-                    <p className="mt-1 text-sm text-slate-500">{texto}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── PLANOS ──────────────────────────────────────── */}
-      <section id="precos" className="bg-slate-50 px-4 py-16 lg:py-20">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-12 text-center">
-            <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-amber-600">Planos</p>
-            <h2 className="text-3xl font-bold tracking-tight lg:text-4xl">
-              Comece grátis. Pague só quando precisar.
-            </h2>
-          </div>
-          <div className="grid gap-6 lg:grid-cols-3">
-            {planos.map((plano) => (
-              <Card
-                key={plano.nome}
-                className={`relative border-2 ${plano.destaque ? 'border-[#0F1B33] shadow-xl' : 'border-slate-200'}`}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+            {calculadoras.map(({ label, desc }) => (
+              <div
+                key={label}
+                className="bg-[#0B1F3A] border border-[#1a2f4a] rounded-xl p-5 hover:border-[#E8A020]/40 transition-colors group"
               >
-                {plano.destaque && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                    <Badge className="bg-amber-500 text-white hover:bg-amber-500">Mais escolhido</Badge>
+                <h3 className="font-semibold text-sm mb-1 group-hover:text-[#E8A020] transition-colors">
+                  {label}
+                </h3>
+                <p className="text-[#8ba4bc] text-xs leading-relaxed">{desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-center text-sm text-[#8ba4bc]">
+            + 7 calculadoras adicionais disponíveis após o cadastro
+          </p>
+        </div>
+      </section>
+
+      {/* ── Diferenciais ───────────────────────────────────────────── */}
+      <section className="max-w-6xl mx-auto px-6 py-24">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
+          Por que o Normato
+        </h2>
+
+        <div className="grid md:grid-cols-3 gap-8">
+          {[
+            {
+              title: "Normas estaduais, não genéricas",
+              desc: "O sistema diferencia RJ, SP e os demais estados. Cada cálculo aplica a instrução técnica correta para o corpo de bombeiros responsável pelo alvará.",
+            },
+            {
+              title: "Rastreabilidade completa",
+              desc: "Cada resultado vem acompanhado da referência normativa exata — artigo, tabela e número da norma — para que o responsável técnico possa assinar com segurança.",
+            },
+            {
+              title: "Resultado em segundos",
+              desc: "Um event designer leva horas numa planilha para chegar nos mesmos números. O Normato entrega tudo em menos de cinco segundos, sem margem para erro de digitação.",
+            },
+          ].map(({ title, desc }) => (
+            <div key={title} className="bg-[#0d2440] border border-[#1a2f4a] rounded-2xl p-8">
+              <div className="w-10 h-10 rounded-lg bg-[#E8A020]/10 border border-[#E8A020]/20 flex items-center justify-center mb-5">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <path d="M3 9l4 4 8-8" stroke="#E8A020" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              <h3 className="font-semibold mb-3">{title}</h3>
+              <p className="text-[#8ba4bc] text-sm leading-relaxed">{desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── FAQ ────────────────────────────────────────────────────── */}
+      <section id="faq" className="bg-[#0d2440] border-y border-[#1a2f4a]">
+        <div className="max-w-3xl mx-auto px-6 py-24">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
+            Perguntas frequentes
+          </h2>
+
+          <div className="flex flex-col gap-3">
+            {faq.map(({ q, a }, i) => (
+              <div key={i} className="border border-[#1a2f4a] rounded-xl overflow-hidden">
+                <button
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  className="w-full flex items-center justify-between px-6 py-5 text-left text-sm font-medium hover:bg-[#0B1F3A]/50 transition-colors"
+                  aria-expanded={openFaq === i}
+                >
+                  <span>{q}</span>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    className={`shrink-0 ml-4 transition-transform ${openFaq === i ? "rotate-180" : ""}`}
+                  >
+                    <path d="M3 6l5 5 5-5" stroke="#8ba4bc" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+                {openFaq === i && (
+                  <div className="px-6 pb-5 text-sm text-[#8ba4bc] leading-relaxed border-t border-[#1a2f4a] pt-4">
+                    {a}
                   </div>
                 )}
-                <CardContent className="flex flex-col gap-6 p-6">
-                  <div>
-                    <p className="text-sm font-semibold text-slate-500">{plano.nome}</p>
-                    <div className="mt-2 flex items-end gap-1">
-                      <span className="text-4xl font-bold">{plano.preco}</span>
-                      <span className="mb-1 text-sm text-slate-500">/{plano.periodo}</span>
-                    </div>
-                    <p className="mt-2 text-sm text-slate-600">{plano.descricao}</p>
-                  </div>
-                  <ul className="flex flex-col gap-2.5">
-                    {plano.items.map((item) => (
-                      <li key={item} className="flex items-start gap-2.5 text-sm">
-                        <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-600" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                  <a href={plano.href}>
-                    <Button
-                      className={`w-full ${plano.destaque ? 'bg-[#0F1B33] hover:bg-[#1b2b4c]' : ''}`}
-                      variant={plano.destaque ? 'default' : 'outline'}
-                    >
-                      {plano.cta} <ChevronRight className="ml-1 size-4" />
-                    </Button>
-                  </a>
-                </CardContent>
-              </Card>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── FAQ ─────────────────────────────────────────── */}
-      <section className="px-4 py-16 lg:py-20">
-        <div className="mx-auto max-w-3xl">
-          <div className="mb-12 text-center">
-            <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-amber-600">Dúvidas frequentes</p>
-            <h2 className="text-3xl font-bold tracking-tight">Perguntas e respostas</h2>
-          </div>
-          <div className="flex flex-col gap-4">
-            {faq.map(({ q, a }) => (
-              <Card key={q} className="border-slate-200">
-                <CardContent className="p-6">
-                  <p className="font-semibold">{q}</p>
-                  <p className="mt-3 text-sm leading-relaxed text-slate-600">{a}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+      {/* ── CTA ────────────────────────────────────────────────────── */}
+      <section className="max-w-6xl mx-auto px-6 py-24 text-center">
+        <div className="flex justify-center mb-8">
+          <NormatoSymbolLight size={56} />
         </div>
+        <h2 className="text-3xl md:text-5xl font-bold mb-6">
+          Calcule seu próximo evento
+        </h2>
+        <p className="text-[#8ba4bc] text-lg mb-10 max-w-xl mx-auto">
+          Cadastro gratuito. Sem cartão de crédito. Resultados técnicos em segundos.
+        </p>
+        <Link
+          href="/auth/cadastro"
+          className="inline-flex items-center gap-2 bg-[#E8A020] text-[#0B1F3A] font-semibold px-10 py-4 rounded-xl text-base hover:bg-[#d4911c] transition-colors"
+        >
+          Criar conta gratuita
+        </Link>
       </section>
 
-      {/* ── CTA FINAL ───────────────────────────────────── */}
-      <section className="bg-[#0F1B33] px-4 py-16 text-white lg:py-20">
-        <div className="mx-auto max-w-3xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight lg:text-4xl">
-            Seu próximo evento começa com o dimensionamento certo
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-slate-300">
-            Cadastre-se gratuitamente e faça seu primeiro cálculo agora.
-            Sem cartão de crédito. Sem burocracia.
-          </p>
-          <a href="/auth/cadastro" className="mt-8 inline-block">
-            <Button size="lg" className="bg-[#F59E0B] text-[#0F1B33] hover:bg-amber-400">
-              Criar conta grátis <ArrowRight className="ml-2 size-4" />
-            </Button>
-          </a>
-          <p className="mt-4 text-sm text-slate-400">
-            Primeiro cálculo gratuito. Cancele quando quiser.
+      {/* ── Footer ─────────────────────────────────────────────────── */}
+      <footer className="border-t border-[#1a2f4a] py-10">
+        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-3">
+            <NormatoSymbol size={28} />
+            <span className="font-semibold tracking-wide">Normato</span>
+          </div>
+          <p className="text-sm text-[#8ba4bc] text-center md:text-right">
+            © {new Date().getFullYear()} Todos os direitos reservados à{" "}
+            <a
+              href="https://arxum.com.br"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#E8A020] hover:underline"
+            >
+              ARXUM group
+            </a>
           </p>
         </div>
-      </section>
+      </footer>
 
-      <Footer />
     </div>
   )
 }

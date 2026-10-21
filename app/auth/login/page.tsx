@@ -1,154 +1,136 @@
-'use client'
+"use client"
 
-import { Suspense } from 'react'
-import { useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { ArrowRight, Eye, EyeOff, Zap } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-
-function Logo() {
-  return (
-    <a href="/" className="flex items-center gap-2" aria-label="Event Engine">
-      <svg viewBox="0 0 200 200" className="size-9" role="img">
-        <rect x="20" y="20" width="160" height="160" rx="38" fill="#0F1B33" />
-        <rect x="55" y="52" width="22" height="96" rx="11" fill="#FFFFFF" />
-        <rect x="55" y="52" width="92" height="22" rx="11" fill="#FFFFFF" />
-        <rect x="55" y="89" width="60" height="22" rx="11" fill="#FFFFFF" />
-        <rect x="55" y="126" width="92" height="22" rx="11" fill="#FFFFFF" />
-        <circle cx="140" cy="100" r="12" fill="#F59E0B" />
-      </svg>
-      <span className="text-lg font-bold tracking-tight text-[#0F1B33]">
-        event <span className="text-[#F59E0B]">engine</span>
-      </span>
-    </a>
-  )
-}
+import { Suspense } from "react"
+import { useSearchParams, useRouter } from "next/navigation"
+import { useState } from "react"
+import Link from "next/link"
+import { createBrowserClient } from "@/lib/supabase/client"
 
 function LoginForm() {
-  const router = useRouter()
   const searchParams = useSearchParams()
-  const next = searchParams.get('next') ?? '/painel'
-
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
+  const router = useRouter()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const supabase = createClient()
+  const redirectTo = searchParams.get("redirectTo") ?? "/painel"
 
-  const handleLogin = async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     setError(null)
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    try {
+      const supabase = createBrowserClient()
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-    if (error) {
-      setError('E-mail ou senha incorretos.')
+      if (authError) {
+        setError("E-mail ou senha incorretos.")
+        setLoading(false)
+        return
+      }
+
+      router.push(redirectTo)
+    } catch {
+      setError("Erro inesperado. Tente novamente.")
       setLoading(false)
-      return
     }
-
-    router.push(next)
-    router.refresh()
   }
 
   return (
-    <Card className="w-full max-w-md border-slate-200">
-      <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Entrar na sua conta</CardTitle>
-        <CardDescription>
-          Não tem conta?{' '}
-          <a href="/auth/cadastro" className="font-semibold text-amber-700 hover:underline">
-            Cadastre-se grátis
-          </a>
-        </CardDescription>
-      </CardHeader>
+    <div className="min-h-screen bg-[#0B1F3A] flex items-center justify-center px-6">
+      <div className="w-full max-w-sm">
+        {/* Logo */}
+        <div className="flex items-center justify-center gap-3 mb-10">
+          <svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+            <rect width="40" height="40" rx="8" fill="#0B1F3A" />
+            <rect width="40" height="40" rx="8" stroke="#1a2f4a" strokeWidth="1" />
+            <rect x="7" y="7" width="6" height="26" rx="1.5" fill="#FFFFFF" />
+            <rect x="27" y="7" width="6" height="26" rx="1.5" fill="#FFFFFF" />
+            <line x1="13" y1="7" x2="27" y2="33" stroke="#E8A020" strokeWidth="6" strokeLinecap="round" />
+          </svg>
+          <span className="text-white font-semibold text-xl tracking-wide">Normato</span>
+        </div>
 
-      <CardContent>
-        <form onSubmit={handleLogin} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="email">E-mail</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="seu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-            />
-          </div>
+        <div className="bg-[#0d2440] border border-[#1a2f4a] rounded-2xl p-8">
+          <h1 className="text-xl font-semibold mb-1">Entrar na conta</h1>
+          <p className="text-[#8ba4bc] text-sm mb-8">
+            Ainda não tem conta?{" "}
+            <Link href="/auth/cadastro" className="text-[#E8A020] hover:underline">
+              Criar gratuitamente
+            </Link>
+          </p>
 
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="password">Senha</Label>
-              <a href="#" className="text-xs text-slate-500 hover:text-slate-800">
-                Esqueci minha senha
-              </a>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <div>
+              <label className="block text-sm font-medium mb-2" htmlFor="email">
+                E-mail
+              </label>
+              <input
+                id="email"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-[#0B1F3A] border border-[#1a2f4a] rounded-lg px-4 py-3 text-sm text-white placeholder-[#4a6480] focus:outline-none focus:border-[#E8A020] transition-colors"
+                placeholder="seu@email.com"
+              />
             </div>
-            <div className="relative">
-              <Input
+
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-medium" htmlFor="password">
+                  Senha
+                </label>
+                <Link href="/auth/recuperar" className="text-xs text-[#8ba4bc] hover:text-[#E8A020] transition-colors">
+                  Esqueci minha senha
+                </Link>
+              </div>
+              <input
                 id="password"
-                type={showPassword ? 'text' : 'password'}
-                placeholder="••••••••"
+                type="password"
+                autoComplete="current-password"
+                required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
-                autoComplete="current-password"
-                className="pr-10"
+                className="w-full bg-[#0B1F3A] border border-[#1a2f4a] rounded-lg px-4 py-3 text-sm text-white placeholder-[#4a6480] focus:outline-none focus:border-[#E8A020] transition-colors"
+                placeholder="••••••••"
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
-              >
-                {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-              </button>
             </div>
-          </div>
 
-          {error && (
-            <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
-          )}
+            {error && (
+              <div className="bg-red-900/20 border border-red-500/30 rounded-lg px-4 py-3 text-sm text-red-400">
+                {error}
+              </div>
+            )}
 
-          <Button
-            type="submit"
-            disabled={loading}
-            className="mt-2 bg-[#0F1B33] hover:bg-[#1b2b4c]"
-          >
-            {loading ? 'Entrando...' : <>Entrar <ArrowRight className="ml-2 size-4" /></>}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-[#E8A020] text-[#0B1F3A] font-semibold py-3 rounded-lg text-sm hover:bg-[#d4911c] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {loading ? "Entrando..." : "Entrar"}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
   )
 }
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-screen flex-col bg-[#F7F8FA]">
-      <header className="border-b border-slate-200 bg-white px-4 py-4">
-        <Logo />
-      </header>
-
-      <main className="flex flex-1 items-center justify-center p-4">
-        <Suspense fallback={<div className="text-slate-400">Carregando...</div>}>
-          <LoginForm />
-        </Suspense>
-      </main>
-
-      <footer className="py-6 text-center text-xs text-slate-400">
-        <span className="flex items-center justify-center gap-1">
-          <Zap className="size-3 text-amber-500" /> Event Engine
-        </span>
-      </footer>
-    </div>
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#0B1F3A] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-[#E8A020] border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   )
 }
