@@ -20,6 +20,8 @@ export type Database = {
           plan_expires_at: string | null
           pagarme_customer_id: string | null
           pagarme_subscription_id: string | null
+          subscription_provider: string | null
+          subscription_id: string | null
           accepted_terms_at: string | null
           created_at: string
           updated_at: string
@@ -40,6 +42,8 @@ export type Database = {
           plan_expires_at?: string | null
           pagarme_customer_id?: string | null
           pagarme_subscription_id?: string | null
+          subscription_provider?: string | null
+          subscription_id?: string | null
           accepted_terms_at?: string | null
           updated_at?: string
         }
@@ -162,6 +166,8 @@ export type Database = {
           pagarme_link_id: string | null
           pagarme_order_id: string | null
           pagarme_subscription_id: string | null
+          provider: string
+          external_id: string | null
           created_at: string
           paid_at: string | null
         }
@@ -174,6 +180,8 @@ export type Database = {
           pagarme_link_id?: string | null
           pagarme_order_id?: string | null
           pagarme_subscription_id?: string | null
+          provider?: string
+          external_id?: string | null
           paid_at?: string | null
         }
         Update: {
@@ -181,6 +189,7 @@ export type Database = {
           pagarme_link_id?: string | null
           pagarme_order_id?: string | null
           pagarme_subscription_id?: string | null
+          external_id?: string | null
           paid_at?: string | null
         }
         Relationships: []

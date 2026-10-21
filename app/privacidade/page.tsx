@@ -12,7 +12,7 @@ export default function PrivacidadePage() {
     <ul>
       <li><strong>Cadastro:</strong> nome, e-mail, senha (guardada de forma criptografada pelo provedor de autenticação) e data de aceite destes termos.</li>
       <li><strong>Uso do serviço:</strong> eventos que você cadastra (nome, cidade, data, público etc.), parâmetros informados nas calculadoras e resultados gerados.</li>
-      <li><strong>Pagamentos:</strong> produto comprado, valor, data e situação do pagamento. Os dados de cartão e de Pix são informados diretamente ao Pagar.me e não passam pelos nossos servidores.</li>
+      <li><strong>Pagamentos:</strong> produto comprado, valor, data e situação do pagamento. Os dados de cartão e de Pix são informados diretamente ao Mercado Pago ou ao Pagar.me e não passam pelos nossos servidores.</li>
       <li><strong>Dados técnicos:</strong> cookies de sessão necessários para manter você conectado e registros técnicos de acesso (endereço IP, data e hora), mantidos pelo prazo exigido no Marco Civil da Internet.</li>
     </ul>
 
@@ -29,7 +29,7 @@ export default function PrivacidadePage() {
     <ul>
       <li><strong>Supabase</strong> — banco de dados e autenticação;</li>
       <li><strong>Vercel</strong> — hospedagem do site;</li>
-      <li><strong>Pagar.me (Stone)</strong> — processamento de pagamentos.</li>
+      <li><strong>Mercado Pago</strong> e <strong>Pagar.me (Stone)</strong> — processamento de pagamentos.</li>
     </ul>
     <p>Alguns desses fornecedores podem armazenar dados fora do Brasil, com cláusulas contratuais e medidas de segurança compatíveis com a LGPD (art. 33). Também podemos compartilhar dados quando exigido por lei ou ordem judicial.</p>
 

@@ -37,7 +37,7 @@ export default function TermosPage() {
     </ul>
 
     <h2>5. Pagamentos, arrependimento e reembolso</h2>
-    <p>Os pagamentos são processados pelo Pagar.me. Não armazenamos dados de cartão. Nas compras feitas pela internet, você pode desistir em até 7 dias, conforme o art. 49 do Código de Defesa do Consumidor: devolvemos o valor de créditos ainda não usados e, no caso de plano, o valor da primeira mensalidade. Para pedir, escreva para <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</p>
+    <p>Os pagamentos são processados pelo Mercado Pago ou pelo Pagar.me (Stone). Não armazenamos dados de cartão. Nas compras feitas pela internet, você pode desistir em até 7 dias, conforme o art. 49 do Código de Defesa do Consumidor: devolvemos o valor de créditos ainda não usados e, no caso de plano, o valor da primeira mensalidade. Para pedir, escreva para <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</p>
 
     <h2>6. Preços e mudanças no serviço</h2>
     <p>Os preços estão na página de <Link href="/precos">Preços</Link>. Mudanças de preço de planos valem a partir da renovação seguinte e serão avisadas por e-mail com antecedência. Podemos incluir, alterar ou retirar calculadoras e funcionalidades, preservando os créditos já comprados.</p>

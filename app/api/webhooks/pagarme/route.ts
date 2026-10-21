@@ -83,7 +83,7 @@ async function handleInvoicePaid(admin: Admin, invoiceId: string) {
 
   // Dono da assinatura: renovação (já vinculada) ou primeira cobrança (compra pendente)
   let userId: string | null = null
-  const { data: linked } = await admin.from('profiles').select('id').eq('pagarme_subscription_id', subscriptionId).maybeSingle()
+  const { data: linked } = await admin.from('profiles').select('id').eq('subscription_id', subscriptionId).maybeSingle()
   if (linked) userId = linked.id
 
   let payment = null
@@ -104,7 +104,7 @@ async function handleInvoicePaid(admin: Admin, invoiceId: string) {
 
   const { error } = await admin
     .from('profiles')
-    .update({ plan: productId, plan_expires_at: expiresAt, pagarme_subscription_id: subscriptionId, pagarme_customer_id: subscription.customer?.id ?? null })
+    .update({ plan: productId, plan_expires_at: expiresAt, pagarme_subscription_id: subscriptionId, pagarme_customer_id: subscription.customer?.id ?? null, subscription_provider: 'pagarme', subscription_id: subscriptionId })
     .eq('id', userId)
   if (error) throw error
 

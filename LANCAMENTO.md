@@ -15,7 +15,35 @@ Depois, em **Authentication → URL Configuration**:
 - **Site URL:** `https://arxum.com.br/normato`
 - **Redirect URLs:** adicione `https://arxum.com.br/normato/auth/callback`
 
-## 2. Pagar.me
+## 1b. Banco de dados — provedores de pagamento
+
+Mesmo procedimento do passo 1, com o arquivo `supabase/migrations/20261022_provedores_pagamento.sql`.
+
+## 2a. Mercado Pago (provedor ativo enquanto o Pagar.me não libera)
+
+1. Entre em https://www.mercadopago.com.br/developers/panel/app com a conta Mercado Pago que vai **receber** o dinheiro → **Criar aplicação**.
+   - Nome: `Normato` · Tipo de solução: **Pagamentos online** · Produto: **Checkout Pro** (marque também **Assinaturas** se aparecer) → **Criar**.
+2. Dentro da aplicação, menu **Credenciais de produção** → copie o **Access Token** (começa com `APP_USR-`).
+   - Para testar antes, use **Credenciais de teste** (o token de teste também começa com `APP_USR-` ou `TEST-`).
+3. Menu **Webhooks** → **Configurar notificações** → aba **Modo produção**:
+   - **URL:** `https://www.arxum.com.br/normato/api/webhooks/mercadopago`
+   - **Eventos:** marque **Pagamentos** e **Planos e assinaturas**
+   - **Salvar** → clique para revelar a **assinatura secreta** e copie.
+4. Na Vercel (Settings → Environment Variables), crie:
+
+| Nome | Valor |
+|---|---|
+| `MP_ACCESS_TOKEN` | o Access Token do passo 2 (marque **Sensitive**) |
+| `MP_WEBHOOK_SECRET` | a assinatura secreta do passo 3 (marque **Sensitive**) |
+
+5. Vercel → **Deployments** → último deploy → **⋯** → **Redeploy**.
+
+Sem essas variáveis, a página de preços mostra "Pagamentos em breve" e ninguém vê erro.
+
+## 2b. Pagar.me (quando a conta for liberada)
+
+Para trocar de provedor, crie na Vercel `PAYMENT_PROVIDER=pagarme` além das variáveis abaixo. Assinaturas já feitas no Mercado Pago continuam sendo renovadas por ele.
+
 
 1. Crie/acesse a conta em pagar.me (exige CNPJ). Em **Configurações → Chaves**, copie a **chave secreta de teste** (`sk_test_...`).
 2. No terminal do Firebase Studio, na pasta do projeto, crie os planos Solo e Pro (troque `sk_test_XXX` pela sua chave):

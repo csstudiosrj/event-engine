@@ -69,16 +69,16 @@ function ContaContent() {
   return <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-10">
     <div><p className="text-sm font-medium text-amber-600">Minha conta</p><h1 className="text-3xl font-bold">{profile.name || profile.email}</h1></div>
 
-    {pagamentoOk && <Card className="border-emerald-200 bg-emerald-50"><CardContent className="flex gap-3 p-5 text-sm text-emerald-950"><CheckCircle2 className="shrink-0 text-emerald-700" /><p><strong>Pagamento enviado.</strong> Assim que o Pagar.me confirmar (no Pix costuma ser imediato), seus créditos ou seu plano aparecem aqui. Se não aparecer em alguns minutos, atualize a página.</p></CardContent></Card>}
+    {pagamentoOk && <Card className="border-emerald-200 bg-emerald-50"><CardContent className="flex gap-3 p-5 text-sm text-emerald-950"><CheckCircle2 className="shrink-0 text-emerald-700" /><p><strong>Pagamento enviado.</strong> Assim que o pagamento for confirmado (no Pix costuma ser imediato), seus créditos ou seu plano aparecem aqui. Se não aparecer em alguns minutos, atualize a página.</p></CardContent></Card>}
     {message && <p role="status" className="rounded-lg bg-slate-100 px-4 py-3 text-sm">{message}</p>}
 
     <Card className="border-slate-200"><CardHeader><CardTitle className="flex items-center gap-2 text-base"><ShieldCheck className="size-5" /> Plano e créditos</CardTitle></CardHeader><CardContent className="flex flex-col gap-4 text-sm">
       <div className="flex items-center justify-between"><span className="text-slate-500">Plano</span><Badge className={ativo ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100' : 'bg-slate-100 text-slate-700 hover:bg-slate-100'}>{planLabel(profile)}</Badge></div>
-      {ativo && <div className="flex items-center justify-between"><span className="text-slate-500">{profile.pagarme_subscription_id ? 'Próxima renovação até' : 'Acesso até'}</span><strong>{new Date(profile.plan_expires_at!).toLocaleDateString('pt-BR')}</strong></div>}
+      {ativo && <div className="flex items-center justify-between"><span className="text-slate-500">{profile.subscription_id ? 'Próxima renovação até' : 'Acesso até'}</span><strong>{new Date(profile.plan_expires_at!).toLocaleDateString('pt-BR')}</strong></div>}
       <div className="flex items-center justify-between"><span className="text-slate-500">Créditos</span><strong>{profile.credits}</strong></div>
       <div className="flex flex-wrap gap-2 pt-2">
         <ButtonLink href="/precos" className="h-9 bg-[#0F1B33] text-white hover:bg-[#1b2b4c]"><CreditCard data-icon="inline-start" /> {ativo ? 'Comprar créditos' : 'Ver planos e créditos'}</ButtonLink>
-        {ativo && profile.pagarme_subscription_id && <Button variant="outline" className="h-9" disabled={canceling} onClick={cancel}>{canceling ? 'Cancelando...' : 'Cancelar assinatura'}</Button>}
+        {ativo && profile.subscription_id && <Button variant="outline" className="h-9" disabled={canceling} onClick={cancel}>{canceling ? 'Cancelando...' : 'Cancelar assinatura'}</Button>}
       </div>
     </CardContent></Card>
 
