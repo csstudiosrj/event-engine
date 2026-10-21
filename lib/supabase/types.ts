@@ -35,6 +35,7 @@ export type Database = {
           credits?: number
           updated_at?: string
         }
+        Relationships: []
       }
       events: {
         Row: {
@@ -89,6 +90,7 @@ export type Database = {
           status?: 'active' | 'archived'
           updated_at?: string
         }
+        Relationships: []
       }
       calc_results: {
         Row: {
@@ -119,6 +121,7 @@ export type Database = {
           memorial_data?: string | null
           is_compliant?: boolean | null
         }
+        Relationships: []
       }
       credit_transactions: {
         Row: {
@@ -137,11 +140,18 @@ export type Database = {
           description: string
         }
         Update: never
+        Relationships: []
       }
     }
     Views: Record<string, never>
-    Functions: Record<string, never>
+    Functions: {
+      spend_credit: {
+        Args: { p_user_id: string; p_amount: number }
+        Returns: unknown
+      }
+    }
     Enums: Record<string, never>
+    CompositeTypes: Record<string, never>
   }
 }
 

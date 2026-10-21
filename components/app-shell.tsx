@@ -50,12 +50,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const spendCredit = async (description: string): Promise<boolean> => {
     if (!profile) return false
 
-    const { data, error } = await supabase.rpc('spend_credit', {
+    const { error } = await supabase.rpc('spend_credit', {
       p_user_id: profile.id,
-      p_description: description,
+      p_amount: 1,
     })
 
-    if (error || !data) return false
+    if (error) return false
 
     // Atualiza créditos localmente sem refetch
     setProfile((prev) => prev ? { ...prev, credits: prev.credits - 1 } : null)
