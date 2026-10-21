@@ -62,7 +62,7 @@ export default function PricingPage() {
       const res = await fetch(withBase('/api/checkout'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product, payerEmail }) })
       const body = await res.json()
       if (res.ok && body.url) { window.location.href = body.url; return }
-      setError(body.error === 'plano_ativo' ? 'Você já tem uma assinatura ativa. Para trocar de plano, cancele a atual em Minha conta.' : 'Não foi possível abrir o pagamento agora. Tente novamente em instantes.')
+      setError(body.error === 'plano_ativo' ? 'Você já tem uma assinatura ativa. Para trocar de plano, cancele a atual em Minha conta.' : `Não foi possível abrir o pagamento agora. Tente novamente em instantes. (código: ${body.error ?? res.status})`)
     } catch {
       setError('Não foi possível abrir o pagamento agora. Tente novamente em instantes.')
     }

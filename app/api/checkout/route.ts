@@ -42,7 +42,10 @@ export async function POST(request: Request) {
     .insert({ user_id: user.id, product: product.id, amount_cents: product.amountCents, provider })
     .select('id')
     .single()
-  if (error || !payment) return NextResponse.json({ error: 'registro' }, { status: 500 })
+  if (error || !payment) {
+    console.error('[checkout] registro', error)
+    return NextResponse.json({ error: 'registro' }, { status: 500 })
+  }
 
   try {
     if (provider === 'mercadopago') {
