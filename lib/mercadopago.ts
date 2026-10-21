@@ -44,7 +44,8 @@ export async function createMercadoPagoCheckout(productId: ProductId, paymentId:
       idempotencyKey: paymentId,
       body: {
         items: [{ id: product.id, title: product.name, quantity: 1, unit_price: product.amountCents / 100, currency_id: 'BRL' }],
-        payer: { email: payerEmail },
+        // Sem payer.email: o comprador entra com a própria conta no checkout, e um
+        // e-mail igual ao do vendedor faz o Mercado Pago bloquear a preferência
         external_reference: paymentId,
         back_urls: { success: retorno, pending: retorno, failure: `${SITE_URL}/precos` },
         auto_return: 'approved',
