@@ -4,7 +4,7 @@ import { Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { useState } from "react"
 import Link from "next/link"
-import { createBrowserClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 
 function LoginForm() {
   const searchParams = useSearchParams()
@@ -22,7 +22,7 @@ function LoginForm() {
     setError(null)
 
     try {
-      const supabase = createBrowserClient()
+      const supabase = createClient()
       const { error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,

@@ -30,7 +30,7 @@ function NormatoSymbol({ size = 32 }: { size?: number }) {
   )
 }
 
-export default function Header() {
+export function Header() {
   const { profile } = useApp()
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -153,3 +153,4 @@ export default function Header() {
     </header>
   )
 }
+export default Header
