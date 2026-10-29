@@ -1,3 +1,5 @@
+import { getActivePlans, getSignupCredits } from "@/lib/catalogo"
+import { formatBRL, type Plan } from "@/lib/plans"
 import Link from "next/link"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
@@ -10,7 +12,7 @@ export const metadata = pageMetadata({
   path: "/",
 })
 
-const faq = [
+const FAQ = [
   {
     q: "Funciona para qualquer tamanho de evento?",
     a: "Sim. O Normato calcula desde um casamento com 80 convidados até um festival com 50 mil pessoas. Os parâmetros mudam automaticamente conforme o porte, o tipo de ambiente e o estado onde o evento acontece.",
@@ -29,11 +31,24 @@ const faq = [
   },
   {
     q: "O que é um crédito?",
-    a: "Cada cálculo de uma calculadora Essencial consome 1 crédito. Toda conta nova ganha 1 crédito grátis, e você compra mais a partir de R$ 4,90 (5 créditos). Nos planos Solo e Pro os cálculos são ilimitados e incluem as calculadoras Estratégicas.",
+    a: "", // montada com os preços atuais em creditFaq()
   },
 ]
 
-export default function Home() {
+// Resposta sobre créditos com os valores configurados no super admin
+function creditFaq(signupCredits: number, packs: Plan[]) {
+  const boasVindas = signupCredits > 0 ? ` Toda conta nova ganha ${signupCredits === 1 ? "1 crédito grátis" : `${signupCredits} créditos grátis`}.` : ""
+  const menor = [...packs].sort((a, b) => a.amount_cents - b.amount_cents)[0]
+  const compra = menor ? ` Você compra mais a partir de ${formatBRL(menor.amount_cents)} (${menor.credits} créditos).` : ""
+  return `Cada cálculo de uma calculadora Essencial consome 1 crédito.${boasVindas}${compra} Nos planos Solo e Pro os cálculos são ilimitados e incluem as calculadoras Estratégicas.`
+}
+
+// Preços vêm do super admin; ao salvar, ele revalida esta página na hora
+export const revalidate = 300
+
+export default async function Home() {
+  const [plans, signupCredits] = await Promise.all([getActivePlans(), getSignupCredits()])
+  const faq = FAQ.map((f) => (f.a ? f : { ...f, a: creditFaq(signupCredits, plans.filter((p) => p.kind === "credits")) }))
 
   return (
     <div style={{ fontFamily: "system-ui, -apple-system, sans-serif", background: "#F7F8FA", color: "#0F1B33", minHeight: "100vh" }}>

@@ -14,10 +14,12 @@ import { useApp } from '@/components/app-shell'
 import { createClient } from '@/lib/supabase/client'
 import { getCalculatorTitle } from '@/lib/calculators/catalog'
 import { CONTACT_EMAIL, withBase } from '@/lib/config'
-import { PRODUCTS, hasActivePlan, planLabel, type ProductId } from '@/lib/plans'
+import { hasActivePlan, planLabel } from '@/lib/plans'
 import type { CalcResult, Payment } from '@/lib/supabase/types'
 
-const STATUS: Record<string, string> = { pending: 'Aguardando pagamento', paid: 'Pago', canceled: 'Cancelado' }
+const STATUS: Record<string, string> = { pending: 'Aguardando pagamento', paid: 'Pago', canceled: 'Cancelado', refunded: 'Estornado' }
+// Compras feitas antes de o nome ser guardado junto com a compra
+const NOMES_ANTIGOS: Record<string, string> = { creditos_5: 'Normato — 5 créditos', solo: 'Normato Solo (mensal)', pro: 'Normato Pro (mensal)' }
 
 function ContaContent() {
   const { profile, loading, refreshProfile } = useApp()
@@ -34,7 +36,7 @@ function ContaContent() {
   useEffect(() => {
     if (!profile) return
     setName(profile.name ?? '')
-    supabase.from('payments').select('*').order('created_at', { ascending: false }).limit(20).then(({ data }) => setPayments((data ?? []).filter((p) => p.status !== 'canceled' || p.paid_at)))
+    supabase.from('payments').select('*').order('created_at', { ascending: false }).limit(20).then(({ data }) => setPayments((data ?? []).filter((p) => p.kind !== 'test' && (p.status !== 'canceled' || p.paid_at))))
     supabase.from('calc_results').select('*').order('created_at', { ascending: false }).limit(20).then(({ data }) => setCalcs(data ?? []))
   }, [profile?.id, supabase]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -90,7 +92,7 @@ function ContaContent() {
     </CardContent></Card>
 
     <Card className="border-slate-200"><CardHeader><CardTitle className="flex items-center gap-2 text-base"><CreditCard className="size-5" /> Compras</CardTitle></CardHeader><CardContent className="flex flex-col gap-3 text-sm">
-      {payments.length === 0 ? <p className="text-slate-500">Nenhuma compra ainda.</p> : payments.map((p) => <div key={p.id} className="flex items-center justify-between gap-3 border-b border-slate-100 pb-3 last:border-0 last:pb-0"><div><p className="font-semibold">{PRODUCTS[p.product as ProductId]?.name ?? p.product}</p><p className="text-xs text-slate-500">{new Date(p.created_at).toLocaleString('pt-BR')} · {(p.amount_cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p></div><span className={p.status === 'paid' ? 'text-emerald-700' : 'text-slate-500'}>{STATUS[p.status] ?? p.status}</span></div>)}
+      {payments.length === 0 ? <p className="text-slate-500">Nenhuma compra ainda.</p> : payments.map((p) => <div key={p.id} className="flex items-center justify-between gap-3 border-b border-slate-100 pb-3 last:border-0 last:pb-0"><div><p className="font-semibold">{p.description ?? NOMES_ANTIGOS[p.product] ?? p.product}</p><p className="text-xs text-slate-500">{new Date(p.created_at).toLocaleString('pt-BR')} · {(p.amount_cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p></div><span className={p.status === 'paid' ? 'text-emerald-700' : 'text-slate-500'}>{STATUS[p.status] ?? p.status}</span></div>)}
     </CardContent></Card>
 
     <Card className="border-slate-200"><CardHeader><CardTitle className="flex items-center gap-2 text-base"><User className="size-5" /> Dados pessoais</CardTitle></CardHeader><CardContent className="flex flex-col gap-4 text-sm">

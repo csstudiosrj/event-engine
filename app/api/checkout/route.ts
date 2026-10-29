@@ -4,7 +4,8 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { createPaymentLink } from '@/lib/pagarme'
 import { createMercadoPagoCheckout } from '@/lib/mercadopago'
 import { activeProvider } from '@/lib/payments'
-import { PRODUCTS, hasActivePlan, type ProductId } from '@/lib/plans'
+import { checkoutName, hasActivePlan } from '@/lib/plans'
+import { getPlan } from '@/lib/catalogo'
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -18,9 +19,8 @@ export async function POST(request: Request) {
   if (!provider) return NextResponse.json({ error: 'indisponivel' }, { status: 503 })
 
   const body = await request.json().catch(() => null)
-  const productId = body?.product as ProductId
-  const product = PRODUCTS[productId]
-  if (!product) return NextResponse.json({ error: 'produto_invalido' }, { status: 400 })
+  const product = typeof body?.product === 'string' ? await getPlan(body.product) : null
+  if (!product || !product.active) return NextResponse.json({ error: 'produto_invalido' }, { status: 400 })
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -37,11 +37,16 @@ export async function POST(request: Request) {
   const payerEmail = typeof body?.payerEmail === 'string' && EMAIL.test(body.payerEmail.trim()) ? body.payerEmail.trim() : profile.email
 
   const admin = createAdminClient()
-  const { data: payment, error } = await admin
+  const base = { user_id: user.id, product: product.id, amount_cents: product.amount_cents, provider }
+  let { data: payment, error } = await admin
     .from('payments')
-    .insert({ user_id: user.id, product: product.id, amount_cents: product.amountCents, provider })
+    .insert({ ...base, kind: product.kind, credits: product.credits, description: checkoutName(product) })
     .select('id')
     .single()
+  // Banco ainda sem as colunas do super admin (20261029_super_admin.sql): grava só o básico
+  if (error?.message?.includes('column')) {
+    ({ data: payment, error } = await admin.from('payments').insert(base).select('id').single())
+  }
   if (error || !payment) {
     console.error('[checkout] registro', error)
     return NextResponse.json({ error: 'registro' }, { status: 500 })
@@ -49,11 +54,11 @@ export async function POST(request: Request) {
 
   try {
     if (provider === 'mercadopago') {
-      const checkout = await createMercadoPagoCheckout(product.id, payment.id, payerEmail)
+      const checkout = await createMercadoPagoCheckout(product, payment.id, payerEmail)
       await admin.from('payments').update({ external_id: checkout.externalId }).eq('id', payment.id)
       return NextResponse.json({ url: checkout.url })
     }
-    const link = await createPaymentLink(product.id, payment.id, { userId: user.id, name: profile.name ?? '', email: profile.email })
+    const link = await createPaymentLink(product, payment.id, { userId: user.id, name: profile.name ?? '', email: profile.email })
     await admin.from('payments').update({ pagarme_link_id: link.id, external_id: link.id }).eq('id', payment.id)
     return NextResponse.json({ url: link.url })
   } catch (e) {

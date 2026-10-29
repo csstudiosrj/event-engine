@@ -1,7 +1,8 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { mercadopago, mercadoPagoSignatureOk } from '@/lib/mercadopago'
-import { PLAN_GRACE_DAYS, PRODUCTS, type ProductId } from '@/lib/plans'
+import { PLAN_GRACE_DAYS } from '@/lib/plans'
+import { fulfillPayment, paymentKind } from '@/lib/fulfillment'
 
 // Webhook do Mercado Pago. Configurar em Suas integrações → aplicação → Webhooks:
 //   URL: https://www.arxum.com.br/normato/api/webhooks/mercadopago
@@ -27,39 +28,18 @@ async function handlePayment(admin: Admin, paymentId: string) {
 
   const payment = await paymentByReference(admin, mp.external_reference)
   if (!payment) return 'compra não encontrada'
-  const product = PRODUCTS[payment.product as ProductId]
   // Cobranças de assinatura chegam também como payment; o plano é tratado pelo preapproval
-  if (product?.kind !== 'credits') return 'cobrança de assinatura'
+  if (paymentKind(payment) === 'subscription') return 'cobrança de assinatura'
   if (Math.round(Number(mp.transaction_amount) * 100) < payment.amount_cents) return 'valor divergente'
-
-  // A condição status = 'pending' garante que os créditos entram uma única vez
-  const { data: updated } = await admin
-    .from('payments')
-    .update({ status: 'paid', paid_at: new Date().toISOString(), external_id: String(mp.id) })
-    .eq('id', payment.id)
-    .eq('status', 'pending')
-    .select('id')
-  if (!updated?.length) return 'já processado'
-
-  const { error } = await admin.rpc('grant_credits', {
-    p_user_id: payment.user_id,
-    p_amount: product.credits!,
-    p_type: 'purchase',
-    p_description: product.name,
-  })
-  if (error) {
-    await admin.from('payments').update({ status: 'pending', paid_at: null }).eq('id', payment.id)
-    throw error
-  }
-  return 'créditos liberados'
+  return fulfillPayment(admin, payment, { external_id: String(mp.id) })
 }
 
 async function handlePreapproval(admin: Admin, preapprovalId: string, cobrancaAprovada: boolean) {
   const pre = await mercadopago(`/preapproval/${preapprovalId}`)
   const payment = await paymentByReference(admin, pre.external_reference)
   if (!payment) return 'assinatura sem compra correspondente'
-  const product = PRODUCTS[payment.product as ProductId]
-  if (product?.kind !== 'subscription') return 'não é assinatura'
+  if (paymentKind(payment) !== 'subscription' || (payment.product !== 'solo' && payment.product !== 'pro')) return 'não é assinatura'
+  const plano = payment.product as 'solo' | 'pro'
 
   if (pre.status === 'cancelled' || pre.status === 'paused') {
     // O acesso segue até plan_expires_at; só deixa de renovar
@@ -74,11 +54,11 @@ async function handlePreapproval(admin: Admin, preapprovalId: string, cobrancaAp
   const expiresAt = new Date(proxima.getTime() + PLAN_GRACE_DAYS * 86400000).toISOString()
   const { error } = await admin
     .from('profiles')
-    .update({ plan: product.id as 'solo' | 'pro', plan_expires_at: expiresAt, subscription_provider: 'mercadopago', subscription_id: pre.id })
+    .update({ plan: plano, plan_expires_at: expiresAt, subscription_provider: 'mercadopago', subscription_id: pre.id })
     .eq('id', payment.user_id)
   if (error) throw error
   await admin.from('payments').update({ status: 'paid', paid_at: new Date().toISOString() }).eq('id', payment.id).eq('status', 'pending')
-  return `plano ${product.id} até ${expiresAt}`
+  return `plano ${plano} até ${expiresAt}`
 }
 
 async function handleAuthorizedPayment(admin: Admin, id: string) {

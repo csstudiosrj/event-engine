@@ -23,6 +23,7 @@ export type Database = {
           subscription_provider: string | null
           subscription_id: string | null
           accepted_terms_at: string | null
+          is_admin: boolean
           created_at: string
           updated_at: string
         }
@@ -45,6 +46,7 @@ export type Database = {
           subscription_provider?: string | null
           subscription_id?: string | null
           accepted_terms_at?: string | null
+          is_admin?: boolean
           updated_at?: string
         }
         Relationships: []
@@ -162,12 +164,17 @@ export type Database = {
           user_id: string
           product: string
           amount_cents: number
-          status: 'pending' | 'paid' | 'canceled'
+          status: 'pending' | 'paid' | 'canceled' | 'refunded'
           pagarme_link_id: string | null
           pagarme_order_id: string | null
           pagarme_subscription_id: string | null
           provider: string
           external_id: string | null
+          kind: 'credits' | 'subscription' | 'test' | null
+          credits: number | null
+          description: string | null
+          pix_qr_code: string | null
+          refunded_at: string | null
           created_at: string
           paid_at: string | null
         }
@@ -176,22 +183,74 @@ export type Database = {
           user_id: string
           product: string
           amount_cents: number
-          status?: 'pending' | 'paid' | 'canceled'
+          status?: 'pending' | 'paid' | 'canceled' | 'refunded'
           pagarme_link_id?: string | null
           pagarme_order_id?: string | null
           pagarme_subscription_id?: string | null
           provider?: string
           external_id?: string | null
+          kind?: 'credits' | 'subscription' | 'test' | null
+          credits?: number | null
+          description?: string | null
           paid_at?: string | null
         }
         Update: {
-          status?: 'pending' | 'paid' | 'canceled'
+          status?: 'pending' | 'paid' | 'canceled' | 'refunded'
           pagarme_link_id?: string | null
           pagarme_order_id?: string | null
           pagarme_subscription_id?: string | null
           external_id?: string | null
+          pix_qr_code?: string | null
+          refunded_at?: string | null
+          provider?: string
           paid_at?: string | null
         }
+        Relationships: []
+      }
+      plans: {
+        Row: {
+          id: string
+          kind: 'credits' | 'subscription'
+          name: string
+          description: string
+          amount_cents: number
+          credits: number | null
+          features: string[]
+          highlight: boolean
+          active: boolean
+          sort: number
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          kind: 'credits' | 'subscription'
+          name: string
+          description?: string
+          amount_cents: number
+          credits?: number | null
+          features?: string[]
+          highlight?: boolean
+          active?: boolean
+          sort?: number
+          updated_at?: string
+        }
+        Update: {
+          name?: string
+          description?: string
+          amount_cents?: number
+          credits?: number | null
+          features?: string[]
+          highlight?: boolean
+          active?: boolean
+          sort?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      app_settings: {
+        Row: { key: string; value: Json; updated_at: string }
+        Insert: { key: string; value: Json; updated_at?: string }
+        Update: { value?: Json; updated_at?: string }
         Relationships: []
       }
       webhook_events: {

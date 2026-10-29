@@ -19,6 +19,12 @@ Depois, em **Authentication → URL Configuration**:
 
 Mesmo procedimento do passo 1, com o arquivo `supabase/migrations/20261022_provedores_pagamento.sql`.
 
+## 1c. Super admin
+
+Mesmo procedimento do passo 1, com o arquivo `supabase/migrations/20261029_super_admin.sql`. Ele cria as tabelas de planos e configurações e marca a sua conta como super admin (troque o e-mail no fim do arquivo se a sua conta no Normato usar outro).
+
+Depois, o painel fica em **https://www.arxum.com.br/normato/admin** (ou no menu do seu avatar → **Super admin**).
+
 ## 2a. Mercado Pago (provedor ativo enquanto o Pagar.me não libera)
 
 1. Entre em https://www.mercadopago.com.br/developers/panel/app com a conta Mercado Pago que vai **receber** o dinheiro → **Criar aplicação**.

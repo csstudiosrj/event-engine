@@ -1,7 +1,7 @@
 // Cliente mínimo da API v5 do Pagar.me (https://api.pagar.me/core/v5).
 // Autenticação: Basic com a chave secreta como usuário e senha vazia.
 
-import { PRODUCTS, type ProductId } from '@/lib/plans'
+import { checkoutName, type Plan, type ProductId } from '@/lib/plans'
 import { SITE_URL } from '@/lib/config'
 
 const API = 'https://api.pagar.me/core/v5'
@@ -47,14 +47,16 @@ type Customer = { userId: string; name: string; email: string }
 
 // Cria um link de pagamento de uso único. O `paymentId` (nosso id interno) vai
 // em `order_code` para o webhook encontrar a compra de volta.
-export async function createPaymentLink(productId: ProductId, paymentId: string, customer: Customer) {
-  const product = PRODUCTS[productId]
+// Assinaturas usam o preço do plano criado no Pagar.me (PAGARME_PLAN_*_ID); mudar o
+// preço no super admin exige atualizar também o plano lá.
+export async function createPaymentLink(product: Plan, paymentId: string, customer: Customer) {
   const isSubscription = product.kind === 'subscription'
-  const planId = planIdFor(productId)
-  if (isSubscription && !planId) throw new Error(`Plano ${productId} sem PAGARME_PLAN_*_ID configurado`)
+  const planId = planIdFor(product.id)
+  if (isSubscription && !planId) throw new Error(`Plano ${product.id} sem PAGARME_PLAN_*_ID configurado`)
+  const nome = checkoutName(product)
 
   const body = {
-    name: product.name.slice(0, 64),
+    name: nome.slice(0, 64),
     type: isSubscription ? 'subscription' : 'order',
     order_code: paymentId,
     max_paid_sessions: 1,
@@ -69,7 +71,7 @@ export async function createPaymentLink(productId: ProductId, paymentId: string,
           accepted_payment_methods: ['pix', 'credit_card'],
           statement_descriptor: 'NORMATO',
           pix_settings: { expires_in: 60 * 60 },
-          credit_card_settings: { operation_type: 'auth_and_capture', installments: [{ number: 1, total: product.amountCents }] },
+          credit_card_settings: { operation_type: 'auth_and_capture', installments: [{ number: 1, total: product.amount_cents }] },
         },
     // Pix exige CPF/CNPJ e telefone do comprador. Na compra avulsa não enviamos
     // o cliente, e o checkout do Pagar.me pede todos os dados. Na assinatura o
@@ -88,7 +90,7 @@ export async function createPaymentLink(productId: ProductId, paymentId: string,
       : {}),
     cart_settings: isSubscription
       ? { recurrences: [{ plan_id: planId }] }
-      : { items: [{ name: product.name, amount: product.amountCents, default_quantity: 1 }] },
+      : { items: [{ name: nome, amount: product.amount_cents, default_quantity: 1 }] },
     layout_settings: { primary_color: '#0B1F3A', secondary_color: '#E8A020' },
     flow_settings: { success_url: `${SITE_URL}/conta?pagamento=ok` },
   }

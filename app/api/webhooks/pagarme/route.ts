@@ -2,7 +2,8 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { timingSafeEqual } from 'crypto'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { findStrings, pagarme, productForPlanId } from '@/lib/pagarme'
-import { PLAN_GRACE_DAYS, PRODUCTS, type ProductId } from '@/lib/plans'
+import { PLAN_GRACE_DAYS } from '@/lib/plans'
+import { fulfillPayment, paymentKind } from '@/lib/fulfillment'
 
 // Webhook do Pagar.me. Configurar no painel (Configurações → Webhooks) com a URL
 //   https://www.arxum.com.br/normato/api/webhooks/pagarme?token=<PAGARME_WEBHOOK_TOKEN>
@@ -44,31 +45,9 @@ async function handleOrderPaid(admin: Admin, orderId: string) {
 
   const payment = await findPayment(admin, order, order.code)
   if (!payment) return 'compra não encontrada'
-  const product = PRODUCTS[payment.product as ProductId]
-  if (product?.kind !== 'credits') return 'não é compra de créditos'
+  if (paymentKind(payment) === 'subscription') return 'não é compra de créditos'
   if (order.amount !== undefined && order.amount < payment.amount_cents) return 'valor divergente'
-
-  // A condição status = 'pending' garante que os créditos entram uma única vez
-  const { data: updated } = await admin
-    .from('payments')
-    .update({ status: 'paid', paid_at: new Date().toISOString(), pagarme_order_id: orderId })
-    .eq('id', payment.id)
-    .eq('status', 'pending')
-    .select('id')
-  if (!updated?.length) return 'já processado'
-
-  const { error } = await admin.rpc('grant_credits', {
-    p_user_id: payment.user_id,
-    p_amount: product.credits!,
-    p_type: 'purchase',
-    p_description: product.name,
-  })
-  if (error) {
-    // Reabre a compra para o reenvio do webhook tentar de novo
-    await admin.from('payments').update({ status: 'pending', paid_at: null }).eq('id', payment.id)
-    throw error
-  }
-  return 'créditos liberados'
+  return fulfillPayment(admin, payment, { pagarme_order_id: orderId })
 }
 
 async function handleInvoicePaid(admin: Admin, invoiceId: string) {

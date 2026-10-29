@@ -1,21 +1,39 @@
 // Produtos à venda e regras de acesso às calculadoras.
+// Preços, nomes e pacotes ficam na tabela `plans` (editados no super admin);
+// DEFAULT_PLANS só vale enquanto a tabela não existe.
 
 import type { Profile } from '@/lib/supabase/types'
 
-export type ProductId = 'creditos_5' | 'solo' | 'pro'
+export type ProductId = string
 
-export type Product = {
+export type Plan = {
   id: ProductId
-  name: string
-  amountCents: number
   kind: 'credits' | 'subscription'
-  credits?: number
+  name: string
+  description: string
+  amount_cents: number
+  credits: number | null
+  features: string[]
+  highlight: boolean
+  active: boolean
+  sort: number
 }
 
-export const PRODUCTS: Record<ProductId, Product> = {
-  creditos_5: { id: 'creditos_5', name: 'Normato — 5 créditos', amountCents: 490, kind: 'credits', credits: 5 },
-  solo: { id: 'solo', name: 'Normato Solo (mensal)', amountCents: 2990, kind: 'subscription' },
-  pro: { id: 'pro', name: 'Normato Pro (mensal)', amountCents: 4990, kind: 'subscription' },
+export const DEFAULT_PLANS: Plan[] = [
+  { id: 'creditos_5', kind: 'credits', name: 'Créditos', description: 'Pague só quando usar as calculadoras Essenciais.', amount_cents: 490, credits: 5, features: ['1 crédito por cálculo Essencial', 'Pix ou cartão', 'Créditos não expiram', 'Sem assinatura'], highlight: false, active: true, sort: 10 },
+  { id: 'solo', kind: 'subscription', name: 'Solo', description: 'Para organizar um evento com confiança.', amount_cents: 2990, credits: null, features: ['Cálculos ilimitados', 'Calculadoras Essenciais e Estratégicas', '1 evento ativo no painel', 'Histórico de cálculos', 'Cancele quando quiser'], highlight: true, active: true, sort: 20 },
+  { id: 'pro', kind: 'subscription', name: 'Pro', description: 'Para quem gerencia vários eventos.', amount_cents: 4990, credits: null, features: ['Tudo do plano Solo', 'Eventos ativos ilimitados', 'Histórico completo por evento', 'Cancele quando quiser'], highlight: false, active: true, sort: 30 },
+]
+
+export const DEFAULT_SIGNUP_CREDITS = 1
+
+// Nome que aparece no checkout, na fatura do cartão e no histórico de compras
+export function checkoutName(plan: Pick<Plan, 'kind' | 'name' | 'credits'>) {
+  return plan.kind === 'credits' ? `Normato — ${plan.credits} créditos` : `Normato ${plan.name} (mensal)`
+}
+
+export function formatBRL(cents: number) {
+  return (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
 export const CALC_COST = 1

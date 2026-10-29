@@ -2,7 +2,7 @@
 // Créditos: Checkout Pro (preferências). Planos: assinaturas sem plano associado (preapproval).
 
 import { createHmac, timingSafeEqual } from 'crypto'
-import { PRODUCTS, type ProductId } from '@/lib/plans'
+import { checkoutName, type Plan } from '@/lib/plans'
 import { SITE_URL } from '@/lib/config'
 
 const API = 'https://api.mercadopago.com'
@@ -34,8 +34,8 @@ export async function mercadopago<T = Record<string, any>>(path: string, init: {
 type Checkout = { url: string; externalId: string }
 
 // `paymentId` (nosso id interno) vai em external_reference para o webhook achar a compra.
-export async function createMercadoPagoCheckout(productId: ProductId, paymentId: string, payerEmail: string): Promise<Checkout> {
-  const product = PRODUCTS[productId]
+export async function createMercadoPagoCheckout(product: Plan, paymentId: string, payerEmail: string): Promise<Checkout> {
+  const nome = checkoutName(product)
   const retorno = `${SITE_URL}/conta?pagamento=ok`
 
   if (product.kind === 'credits') {
@@ -43,7 +43,7 @@ export async function createMercadoPagoCheckout(productId: ProductId, paymentId:
       method: 'POST',
       idempotencyKey: paymentId,
       body: {
-        items: [{ id: product.id, title: product.name, quantity: 1, unit_price: product.amountCents / 100, currency_id: 'BRL' }],
+        items: [{ id: product.id, title: nome, quantity: 1, unit_price: product.amount_cents / 100, currency_id: 'BRL' }],
         // Sem payer.email: o comprador entra com a própria conta no checkout, e um
         // e-mail igual ao do vendedor faz o Mercado Pago bloquear a preferência
         external_reference: paymentId,
@@ -61,15 +61,45 @@ export async function createMercadoPagoCheckout(productId: ProductId, paymentId:
     method: 'POST',
     idempotencyKey: paymentId,
     body: {
-      reason: product.name,
+      reason: nome,
       external_reference: paymentId,
       payer_email: payerEmail,
-      auto_recurring: { frequency: 1, frequency_type: 'months', transaction_amount: product.amountCents / 100, currency_id: 'BRL' },
+      auto_recurring: { frequency: 1, frequency_type: 'months', transaction_amount: product.amount_cents / 100, currency_id: 'BRL' },
       back_url: retorno,
       status: 'pending',
     },
   })
   return { url: sub.init_point, externalId: sub.id }
+}
+
+// Pix gerado direto (sem checkout): usado pelo super admin para cobrança de teste
+// e para reenviar a cobrança de uma compra pendente ao cliente.
+export type PixPayment = { id: number; status: string; date_of_expiration?: string; point_of_interaction?: { transaction_data?: { qr_code?: string; qr_code_base64?: string; ticket_url?: string } } }
+
+export async function createMercadoPagoPix(p: { paymentId: string; amountCents: number; description: string; payerEmail: string; attempt: number }) {
+  const expira = new Date(Date.now() + 24 * 3600 * 1000)
+  return mercadopago<PixPayment>('/v1/payments', {
+    method: 'POST',
+    idempotencyKey: `pix-${p.paymentId}-${p.attempt}`,
+    body: {
+      transaction_amount: p.amountCents / 100,
+      description: p.description.slice(0, 250),
+      payment_method_id: 'pix',
+      payer: { email: p.payerEmail },
+      external_reference: p.paymentId,
+      notification_url: `${SITE_URL}/api/webhooks/mercadopago`,
+      date_of_expiration: expira.toISOString().replace('Z', '-00:00'),
+    },
+  })
+}
+
+export async function refundMercadoPagoPayment(mpPaymentId: string, refundKey: string) {
+  return mercadopago(`/v1/payments/${encodeURIComponent(mpPaymentId)}/refunds`, { method: 'POST', body: {}, idempotencyKey: refundKey })
+}
+
+// Conta Mercado Pago dona do access token configurado (para conferir PF x PJ)
+export async function mercadoPagoAccount() {
+  return mercadopago<{ id: number; nickname?: string; email?: string; first_name?: string; last_name?: string; identification?: { type?: string; number?: string }; company?: { brand_name?: string; corporate_name?: string } }>('/users/me')
 }
 
 export async function cancelMercadoPagoSubscription(preapprovalId: string) {

@@ -104,6 +104,18 @@ export function Header() {
                       </svg>
                       Painel
                     </Link>
+                    {profile.is_admin && (
+                      <Link
+                        href="/admin"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-[#E8A020] hover:text-white hover:bg-[#1a2f4a] transition-colors"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                          <path d="M8 1.5l5.5 2v4c0 3.5-2.4 6-5.5 7-3.1-1-5.5-3.5-5.5-7v-4l5.5-2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+                        </svg>
+                        Super admin
+                      </Link>
+                    )}
                     <Link
                       href="/conta"
                       onClick={() => setMenuOpen(false)}
